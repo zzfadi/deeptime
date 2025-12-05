@@ -1,11 +1,12 @@
 /**
  * LocationHeader Component
- * Displays current coordinates, search button, and offline indicator
+ * Displays current location name, search button, and offline indicator
  * Requirements: 1.1, 1.4, 5.3
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { GeoCoordinate } from 'deep-time-core/types';
+import { locationService, type GeoCoordinateWithName } from '../services/location';
 
 export interface LocationHeaderProps {
   location: GeoCoordinate | null;
@@ -16,11 +17,11 @@ export interface LocationHeaderProps {
 }
 
 /**
- * Formats coordinates for display
+ * Formats coordinates for display (fallback)
  */
 function formatCoordinates(location: GeoCoordinate): string {
-  const lat = location.latitude.toFixed(4);
-  const lon = location.longitude.toFixed(4);
+  const lat = location.latitude.toFixed(2);
+  const lon = location.longitude.toFixed(2);
   const latDir = location.latitude >= 0 ? 'N' : 'S';
   const lonDir = location.longitude >= 0 ? 'E' : 'W';
   return `${Math.abs(parseFloat(lat))}°${latDir}, ${Math.abs(parseFloat(lon))}°${lonDir}`;
@@ -113,9 +114,9 @@ interface SearchModalProps {
   onLocationSelect: (location: GeoCoordinate) => void;
 }
 
-function SearchModal({ isOpen, onClose, onSearch, onLocationSelect }: SearchModalProps) {
+function SearchModal({ isOpen, onClose, onLocationSelect }: SearchModalProps) {
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<GeoCoordinate[]>([]);
+  const [results, setResults] = useState<GeoCoordinateWithName[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -126,7 +127,8 @@ function SearchModal({ isOpen, onClose, onSearch, onLocationSelect }: SearchModa
     setError(null);
     
     try {
-      const searchResults = await onSearch(query);
+      // Use locationService directly to get display names
+      const searchResults = await locationService.searchLocation(query);
       setResults(searchResults);
       if (searchResults.length === 0) {
         setError('No locations found. Try a different search term.');
@@ -136,9 +138,9 @@ function SearchModal({ isOpen, onClose, onSearch, onLocationSelect }: SearchModa
     } finally {
       setIsSearching(false);
     }
-  }, [query, onSearch]);
+  }, [query]);
 
-  const handleSelect = useCallback((location: GeoCoordinate) => {
+  const handleSelect = useCallback((location: GeoCoordinateWithName) => {
     onLocationSelect(location);
     onClose();
     setQuery('');
@@ -205,8 +207,8 @@ function SearchModal({ isOpen, onClose, onSearch, onLocationSelect }: SearchModa
                   className="w-full p-3 bg-deep-700 hover:bg-deep-600 rounded-lg text-left transition-colors touch-target"
                 >
                   <div className="flex items-center gap-2">
-                    <LocationIcon className="w-4 h-4 text-gray-400" />
-                    <span>{formatCoordinates(location)}</span>
+                    <LocationIcon className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                    <span className="truncate">{location.displayName || formatCoordinates(location)}</span>
                   </div>
                 </button>
               ))}
@@ -231,7 +233,7 @@ function SearchModal({ isOpen, onClose, onSearch, onLocationSelect }: SearchModa
 
 /**
  * LocationHeader Component
- * Displays current location coordinates with search and offline indicators
+ * Displays current location name with search and offline indicators
  * 
  * Requirements:
  * - 1.1: Request GPS location permission (displays location status)
@@ -246,6 +248,36 @@ export function LocationHeader({
   onLocationSelect,
 }: LocationHeaderProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [locationName, setLocationName] = useState<string | null>(null);
+  const [isReverseGeocoding, setIsReverseGeocoding] = useState(false);
+
+  // Reverse geocode when location changes to get a friendly name
+  useEffect(() => {
+    if (!location) {
+      setLocationName(null);
+      return;
+    }
+
+    // Check if location already has a display name (from search)
+    const locWithName = location as GeoCoordinateWithName;
+    if (locWithName.displayName) {
+      setLocationName(locWithName.displayName);
+      return;
+    }
+
+    // Otherwise, reverse geocode
+    setIsReverseGeocoding(true);
+    locationService.reverseGeocode(location)
+      .then(name => {
+        setLocationName(name);
+      })
+      .catch(() => {
+        setLocationName(formatCoordinates(location));
+      })
+      .finally(() => {
+        setIsReverseGeocoding(false);
+      });
+  }, [location]);
 
   return (
     <>
@@ -257,7 +289,9 @@ export function LocationHeader({
           {isLoading ? (
             <span className="text-gray-400 animate-pulse">Locating...</span>
           ) : location ? (
-            <span className="text-white truncate">{formatCoordinates(location)}</span>
+            <span className="text-white truncate">
+              {isReverseGeocoding ? formatCoordinates(location) : (locationName || formatCoordinates(location))}
+            </span>
           ) : (
             <span className="text-gray-400">Location unavailable</span>
           )}

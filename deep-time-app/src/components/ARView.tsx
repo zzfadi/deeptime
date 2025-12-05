@@ -163,7 +163,7 @@ function createEraObject(
  */
 function EraInfoOverlay({ era, narrative }: { era: GeologicalLayer; narrative: Narrative | null }) {
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 bg-black/70 backdrop-blur-sm rounded-xl p-4 safe-bottom">
+    <div className="fixed bottom-20 left-4 right-4 z-50 bg-black/70 backdrop-blur-sm rounded-xl p-4 safe-bottom">
       <h2 className="text-lg font-bold text-white mb-1">{era.era.name}</h2>
       <p className="text-sm text-gray-300 mb-2">{era.era.period}</p>
       {narrative && (
@@ -172,6 +172,24 @@ function EraInfoOverlay({ era, narrative }: { era: GeologicalLayer; narrative: N
         </p>
       )}
     </div>
+  );
+}
+
+/**
+ * Exit AR button - always visible at bottom
+ */
+function ExitARButton({ onExit }: { onExit: () => void }) {
+  return (
+    <button
+      onClick={onExit}
+      className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-semibold rounded-full shadow-lg flex items-center gap-2 safe-bottom"
+      aria-label="Exit AR"
+    >
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+      </svg>
+      Exit AR
+    </button>
   );
 }
 
@@ -504,6 +522,9 @@ export function ARView({ era, narrative, onExit }: ARViewProps) {
           
           {/* Legacy era info overlay for narrative display */}
           <EraInfoOverlay era={displayEra} narrative={narrative} />
+          
+          {/* Always visible Exit AR button */}
+          <ExitARButton onExit={handleExit} />
         </>
       )}
     </div>

@@ -91,10 +91,11 @@ function App() {
 
   // Navigation handlers
   const handleViewEraDetail = useCallback(() => {
-    if (currentEra) {
+    // Only navigate if we have an era and narrative is not loading
+    if (currentEra && !isNarrativeLoading) {
       setCurrentPage('era-detail');
     }
-  }, [currentEra]);
+  }, [currentEra, isNarrativeLoading]);
 
   const handleBackToHome = useCallback(() => {
     setCurrentPage('home');
@@ -144,8 +145,17 @@ function App() {
       );
 
     case 'era-detail':
+      // If no era is selected, go back to home
+      if (!currentEra) {
+        setCurrentPage('home');
+        return <FullPageSpinner />;
+      }
       return (
-        <Suspense fallback={<FullPageSpinner />}>
+        <Suspense fallback={
+          <div className="min-h-screen bg-deep-900 flex items-center justify-center">
+            <FullPageSpinner label="Loading era details..." />
+          </div>
+        }>
           <EraDetail
             era={currentEra}
             narrative={narrative}

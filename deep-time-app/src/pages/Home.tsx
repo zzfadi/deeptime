@@ -62,11 +62,12 @@ export function Home({ onViewEraDetail }: HomeProps) {
   }, [loadCachedLocations]);
 
   // Request location on mount (Requirement 1.1)
+  // On mobile, actively request GPS permission
   useEffect(() => {
-    if (!location && !isLocationLoading && !error) {
+    if (!location && !isLocationLoading && !error && !locationError) {
       requestLocation();
     }
-  }, [location, isLocationLoading, error, requestLocation]);
+  }, [location, isLocationLoading, error, locationError, requestLocation]);
 
   // Handle location selection from search
   const handleLocationSelect = useCallback(
