@@ -40,6 +40,9 @@ export class NarrativeError extends Error {
 
 import { getActiveApiKey } from '../components/ApiKeyModal';
 
+// Import centralized AI model configuration
+import { MODEL_USE_CASES } from '../config/aiModels';
+
 /**
  * Get the current API key (runtime or env)
  * Supports user-provided keys at runtime for hackathon demo
@@ -219,6 +222,8 @@ export const narrativeService: NarrativeService = {
    * Generates a narrative for a geological layer using Gemini AI
    * Requirement 2.1: Send layer metadata to Gemini API
    * Requirement 2.2: Display era-appropriate description with flora, fauna, and climate
+   * 
+   * Uses Gemini 2.5 Flash for balanced performance and detailed narratives
    */
   async generateNarrative(layer: GeologicalLayer): Promise<Narrative> {
     const client = createGeminiClient();
@@ -229,7 +234,8 @@ export const narrativeService: NarrativeService = {
     }
     
     try {
-      const model = client.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      // Use Gemini 2.5 Flash for detailed era narratives
+      const model = client.getGenerativeModel({ model: MODEL_USE_CASES.ERA_NARRATIVE });
       const prompt = buildNarrativePrompt(layer);
       
       const result = await model.generateContent(prompt);
@@ -508,6 +514,8 @@ export const creatureNarrationService = {
    * Generate narration for a specific creature
    * Requirement 4.2: Generate specific explanation about creature on tap
    * Property 9: Creature-Specific Narration - text SHALL contain creature's name
+   * 
+   * Uses Gemini 2.5 Flash-Lite for fast, real-time AR interactions
    */
   async narrateCreature(creature: Creature): Promise<Narration> {
     const client = createGeminiClient();
@@ -518,7 +526,8 @@ export const creatureNarrationService = {
     }
     
     try {
-      const model = client.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      // Use Gemini 2.5 Flash-8B for fast, cost-efficient creature narrations
+      const model = client.getGenerativeModel({ model: MODEL_USE_CASES.CREATURE_NARRATION });
       const prompt = buildCreatureNarrationPrompt(creature);
       
       const result = await model.generateContent(prompt);
@@ -550,6 +559,8 @@ export const creatureNarrationService = {
   /**
    * Generate narration for a new era
    * Requirement 4.1: Generate contextual narration when new era is displayed
+   * 
+   * Uses Gemini 2.5 Flash-Lite for fast era welcome messages
    */
   async narrateEra(eraName: string, creatures: Creature[]): Promise<Narration> {
     const client = createGeminiClient();
@@ -560,7 +571,8 @@ export const creatureNarrationService = {
     }
     
     try {
-      const model = client.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      // Use Gemini 2.5 Flash-8B for fast era welcome narrations
+      const model = client.getGenerativeModel({ model: MODEL_USE_CASES.ERA_WELCOME });
       const prompt = buildEraNarrationPrompt(eraName, creatures);
       
       const result = await model.generateContent(prompt);

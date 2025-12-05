@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { isIOS, getRecommendedARMode, logARCapabilities } from '../utils/iosARDetection';
 
 export interface WebXRSupport {
   /** Whether WebXR API is available in the browser */
@@ -34,7 +35,31 @@ export function useWebXRSupport(): WebXRSupport {
 
   useEffect(() => {
     async function checkWebXRSupport() {
-      // Check if WebXR API exists
+      // Log AR capabilities for debugging
+      logARCapabilities();
+      
+      // Give polyfill time to initialize
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      // Special handling for iOS - WebXR is not supported even with polyfill
+      // iOS uses AR Quick Look or model-viewer instead
+      if (isIOS()) {
+        const recommendedMode = getRecommendedARMode();
+        console.log('iOS detected, recommended AR mode:', recommendedMode);
+        
+        // For now, we'll enable AR on iOS and handle it differently in ARView
+        // This allows the "Enter AR" button to show on iOS devices
+        setSupport({
+          isAvailable: true,
+          isARSupported: true, // Enable AR button on iOS
+          isVRSupported: false,
+          isChecking: false,
+          error: null,
+        });
+        return;
+      }
+
+      // Check if WebXR API exists (native or polyfilled)
       if (!('xr' in navigator) || !navigator.xr) {
         setSupport({
           isAvailable: false,
@@ -54,7 +79,9 @@ export function useWebXRSupport(): WebXRSupport {
         let arSupported = false;
         try {
           arSupported = await xr.isSessionSupported('immersive-ar');
-        } catch {
+          console.log('WebXR AR support check:', arSupported);
+        } catch (err) {
+          console.warn('WebXR AR support check failed:', err);
           arSupported = false;
         }
 
@@ -62,7 +89,9 @@ export function useWebXRSupport(): WebXRSupport {
         let vrSupported = false;
         try {
           vrSupported = await xr.isSessionSupported('immersive-vr');
-        } catch {
+          console.log('WebXR VR support check:', vrSupported);
+        } catch (err) {
+          console.warn('WebXR VR support check failed:', err);
           vrSupported = false;
         }
 
@@ -74,6 +103,7 @@ export function useWebXRSupport(): WebXRSupport {
           error: null,
         });
       } catch (err) {
+        console.error('WebXR support check error:', err);
         setSupport({
           isAvailable: false,
           isARSupported: false,

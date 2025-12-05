@@ -14,6 +14,10 @@ import { useWebXRSupport } from '../hooks';
 // Lazy load ARView component - Three.js is a large dependency
 // This significantly reduces initial bundle size
 const ARView = lazy(() => import('../components/ARView'));
+const IOSARView = lazy(() => import('../components/IOSARView'));
+
+// Import iOS detection
+import { isIOS } from '../utils/iosARDetection';
 
 export interface EraDetailProps {
   /** The geological layer/era to display */
@@ -239,7 +243,10 @@ export function EraDetail({
   // Show AR view when active
   // Requirement 4.4: Offer AR view option when WebXR is supported
   // ARView is lazy loaded to reduce initial bundle size
+  // Use iOS-specific AR view on iOS devices
   if (isARActive && era) {
+    const ARComponent = isIOS() ? IOSARView : ARView;
+    
     return (
       <Suspense fallback={
         <div className="min-h-screen bg-deep-900 flex items-center justify-center">
@@ -249,7 +256,7 @@ export function EraDetail({
           </div>
         </div>
       }>
-        <ARView
+        <ARComponent
           era={era}
           narrative={narrative}
           onExit={handleARExit}
