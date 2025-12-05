@@ -137,13 +137,20 @@ export const locationService: LocationService = {
 
       const results = await response.json();
       
-      return results.map((result: { lat: string; lon: string; display_name: string }) => ({
-        latitude: parseFloat(result.lat),
-        longitude: parseFloat(result.lon),
-        altitude: 0,
-        accuracy: 100, // Geocoding accuracy is approximate
-        displayName: formatDisplayName(result.display_name),
-      }));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return results.map((result: any) => {
+        // Get display name - Nominatim returns it as display_name
+        const fullName = result.display_name || '';
+        const shortName = formatDisplayName(fullName);
+        
+        return {
+          latitude: parseFloat(result.lat),
+          longitude: parseFloat(result.lon),
+          altitude: 0,
+          accuracy: 100, // Geocoding accuracy is approximate
+          displayName: shortName,
+        };
+      });
     } catch (error) {
       if (error instanceof LocationError) {
         throw error;

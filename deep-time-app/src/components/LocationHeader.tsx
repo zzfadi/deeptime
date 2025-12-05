@@ -14,6 +14,7 @@ export interface LocationHeaderProps {
   isOffline: boolean;
   onSearch: (query: string) => Promise<GeoCoordinate[]>;
   onLocationSelect: (location: GeoCoordinate) => void;
+  onRequestLocation?: () => void;
 }
 
 /**
@@ -246,6 +247,7 @@ export function LocationHeader({
   isOffline,
   onSearch,
   onLocationSelect,
+  onRequestLocation,
 }: LocationHeaderProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [locationName, setLocationName] = useState<string | null>(null);
@@ -293,7 +295,23 @@ export function LocationHeader({
               {isReverseGeocoding ? formatCoordinates(location) : (locationName || formatCoordinates(location))}
             </span>
           ) : (
-            <span className="text-gray-400">Location unavailable</span>
+            <div className="flex items-center gap-2">
+              {onRequestLocation && (
+                <button 
+                  onClick={onRequestLocation}
+                  className="text-blue-400 hover:text-blue-300 transition-colors text-sm"
+                >
+                  📍 Use GPS
+                </button>
+              )}
+              <span className="text-gray-500">or</span>
+              <button 
+                onClick={() => setIsSearchOpen(true)}
+                className="text-blue-400 hover:text-blue-300 transition-colors text-sm"
+              >
+                Search
+              </button>
+            </div>
           )}
         </div>
 

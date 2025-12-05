@@ -62,12 +62,21 @@ export function Home({ onViewEraDetail }: HomeProps) {
   }, [loadCachedLocations]);
 
   // Request location on mount (Requirement 1.1)
-  // On mobile, actively request GPS permission
+  // Note: On iOS Safari, geolocation requires user gesture, so we also show a button
   useEffect(() => {
-    if (!location && !isLocationLoading && !error && !locationError) {
+    // Only auto-request on desktop or if we haven't tried yet
+    const hasTriedLocation = sessionStorage.getItem('locationRequested');
+    if (!location && !isLocationLoading && !error && !locationError && !hasTriedLocation) {
+      sessionStorage.setItem('locationRequested', 'true');
       requestLocation();
     }
   }, [location, isLocationLoading, error, locationError, requestLocation]);
+
+  // Manual location request handler (for mobile/iOS)
+  const handleRequestLocation = useCallback(() => {
+    clearErrors();
+    requestLocation();
+  }, [clearErrors, requestLocation]);
 
   // Handle location selection from search
   const handleLocationSelect = useCallback(
@@ -123,6 +132,7 @@ export function Home({ onViewEraDetail }: HomeProps) {
           isOffline={isOffline}
           onSearch={searchLocation}
           onLocationSelect={handleLocationSelect}
+          onRequestLocation={handleRequestLocation}
         />
         <FullPageSpinner label="Discovering geological layers..." />
       </div>
@@ -151,6 +161,7 @@ export function Home({ onViewEraDetail }: HomeProps) {
         isOffline={isOffline}
         onSearch={searchLocation}
         onLocationSelect={handleLocationSelect}
+        onRequestLocation={handleRequestLocation}
       />
 
       {/* Main content */}
