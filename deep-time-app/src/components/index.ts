@@ -37,3 +37,14 @@ export type { ARTimeSliderProps, AREraBoundary } from './ARTimeSlider';
 
 export { AROverlay } from './AROverlay';
 export type { AROverlayProps } from './AROverlay';
+
+// API Key Modal for runtime Gemini key configuration
+export { 
+  ApiKeyModal, 
+  getStoredApiKey, 
+  storeApiKey, 
+  clearApiKey, 
+  hasApiKey, 
+  getActiveApiKey 
+} from './ApiKeyModal';
+export type { default as ApiKeyModalProps } from './ApiKeyModal';

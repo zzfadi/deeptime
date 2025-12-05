@@ -9,7 +9,7 @@
 import { useEffect, useState, useCallback, lazy, Suspense } from 'react';
 import { useAppStore } from './store/appStore';
 import { Home } from './pages';
-import { FullPageSpinner, InstallBanner } from './components';
+import { FullPageSpinner, InstallBanner, ApiKeyModal, hasApiKey } from './components';
 import { useWebXRSupport } from './hooks';
 import { arFallbackDetector } from './ar/ARFallbackDetector';
 
@@ -25,8 +25,19 @@ type Page = 'home' | 'era-detail' | 'ar';
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [arChecked, setArChecked] = useState(false);
+  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
+  const [apiKeyConfigured, setApiKeyConfigured] = useState(hasApiKey());
   const { setOfflineStatus, setViewMode, currentEra, narrative, isNarrativeLoading } = useAppStore();
   const webXRSupport = useWebXRSupport();
+
+  // Show API key prompt on first load if no key configured
+  useEffect(() => {
+    if (!hasApiKey()) {
+      // Delay showing modal to let the app load first
+      const timer = setTimeout(() => setShowApiKeyModal(true), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   // Register service worker and set up offline detection
   useEffect(() => {
@@ -151,6 +162,22 @@ function App() {
         <>
           <Home onViewEraDetail={handleViewEraDetail} />
           <InstallBanner />
+          
+          {/* Settings button - always visible */}
+          <button
+            onClick={() => setShowApiKeyModal(true)}
+            className="fixed bottom-4 right-4 z-40 w-12 h-12 bg-slate-800/90 hover:bg-slate-700 rounded-full flex items-center justify-center shadow-lg border border-slate-700 transition-colors"
+            title="Settings"
+          >
+            <span className="text-xl">{apiKeyConfigured ? '⚙️' : '🔑'}</span>
+          </button>
+          
+          {/* API Key Modal */}
+          <ApiKeyModal
+            isOpen={showApiKeyModal}
+            onClose={() => setShowApiKeyModal(false)}
+            onSave={(key) => setApiKeyConfigured(!!key)}
+          />
         </>
       );
   }

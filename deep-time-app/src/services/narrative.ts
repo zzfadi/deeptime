@@ -38,8 +38,20 @@ export class NarrativeError extends Error {
 // Gemini API Configuration
 // ============================================
 
-// API key should be set via environment variable
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
+import { getActiveApiKey } from '../components/ApiKeyModal';
+
+/**
+ * Get the current API key (runtime or env)
+ * Supports user-provided keys at runtime for hackathon demo
+ */
+function getGeminiApiKey(): string {
+  // First check for runtime-provided key
+  const runtimeKey = getActiveApiKey();
+  if (runtimeKey) return runtimeKey;
+  
+  // Fall back to environment variable
+  return import.meta.env.VITE_GEMINI_API_KEY || '';
+}
 
 /**
  * Gemini prompt template for narrative generation
@@ -191,13 +203,15 @@ function parseGeminiResponse(responseText: string): GeminiNarrativeResponse {
 
 /**
  * Creates a Gemini AI client instance
+ * Uses runtime API key if available, falls back to env variable
  */
 function createGeminiClient(): GoogleGenerativeAI | null {
-  if (!GEMINI_API_KEY) {
+  const apiKey = getGeminiApiKey();
+  if (!apiKey) {
     console.warn('Gemini API key not configured. Using fallback narratives.');
     return null;
   }
-  return new GoogleGenerativeAI(GEMINI_API_KEY);
+  return new GoogleGenerativeAI(apiKey);
 }
 
 export const narrativeService: NarrativeService = {
