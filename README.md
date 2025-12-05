@@ -43,7 +43,7 @@ DeepTime is a mobile AR application that resurrects prehistoric creatures at you
 
 ```bash
 # Clone the repo
-git clone https://github.com/your-username/deeptime.git
+git clone https://github.com/zzfadi/deeptime.git
 cd deeptime
 
 # Install dependencies
