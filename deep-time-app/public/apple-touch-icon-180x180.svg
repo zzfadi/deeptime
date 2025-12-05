@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180">
+  <!-- Apple touch icon - no transparency, rounded corners handled by iOS -->
+  <rect width="180" height="180" fill="#1a1a2e"/>
+  <defs>
+    <linearGradient id="earthGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4a3d2d"/>
+      <stop offset="30%" style="stop-color:#6b5b4f"/>
+      <stop offset="60%" style="stop-color:#8b7355"/>
+      <stop offset="100%" style="stop-color:#a0826d"/>
+    </linearGradient>
+  </defs>
+  <circle cx="90" cy="90" r="65" fill="url(#earthGrad)" stroke="#3d3d5c" stroke-width="3"/>
+  <path d="M38 62 Q90 48 142 62" stroke="#3d4a2d" stroke-width="2.5" fill="none" opacity="0.7"/>
+  <path d="M33 90 Q90 75 147 90" stroke="#4a3d2d" stroke-width="2.5" fill="none" opacity="0.7"/>
+  <path d="M38 118 Q90 103 142 118" stroke="#2d4a3e" stroke-width="2.5" fill="none" opacity="0.7"/>
+</svg>

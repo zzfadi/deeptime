@@ -1,0 +1,217 @@
+# Implementation Plan
+
+- [x] 1. Set up project structure and core types
+  - [x] 1.1 Initialize TypeScript project with build configuration
+    - Create package.json with dependencies (fast-check, typescript, vitest)
+    - Configure tsconfig.json for strict type checking
+    - Set up vitest.config.ts for testing
+    - _Requirements: N/A (infrastructure)_
+  - [x] 1.2 Create core type definitions and interfaces
+    - Define GeoCoordinate, GeologicalLayer, GeologicalStack interfaces
+    - Define MaterialType, FossilIndex, GeologicalEra types
+    - Define Narrative, ARScene, ARObject interfaces
+    - Define MagneticAnomaly, AnomalyClassification types
+    - Define AppMode, ModeConfiguration interfaces
+    - _Requirements: 1.3, 2.1, 3.1, 6.2, 9.1_
+  - [x] 1.3 Create custom fast-check generators for domain types
+    - Implement geologicalLayerArb generator
+    - Implement geologicalStackArb generator with proper layer ordering
+    - Implement narrativeArb generator
+    - Implement magneticAnomalyArb generator
+    - Implement geoCoordinateArb generator
+    - _Requirements: N/A (test infrastructure)_
+
+- [ ] 2. Implement Geological Stack Construction
+  - [x] 2.1 Implement geological layer parsing from API response
+    - Create parseGeologicalResponse function
+    - Validate layer data completeness
+    - Handle missing or malformed fields
+    - _Requirements: 1.2, 1.3_
+  - [ ]* 2.2 Write property test for geological stack layer ordering
+    - **Property 1: Geological Stack Layer Ordering**
+    - **Validates: Requirements 1.3**
+  - [x] 2.3 Implement GeologicalStack builder with layer ordering
+    - Create buildGeologicalStack function
+    - Sort layers by depth
+    - Validate no gaps or overlaps
+    - _Requirements: 1.3_
+
+- [ ] 3. Implement Anomaly Detection System
+  - [x] 3.1 Implement magnetometer baseline calculation
+    - Create calculateBaseline function from reading array
+    - Implement rolling average for stability
+    - _Requirements: 1.4, 6.1_
+  - [x] 3.2 Implement anomaly detection logic
+    - Create detectAnomalies function
+    - Compare readings against baseline threshold
+    - Return flagged anomaly coordinates
+    - _Requirements: 1.4_
+  - [ ]* 3.3 Write property test for anomaly detection threshold consistency
+    - **Property 2: Anomaly Detection Threshold Consistency**
+    - **Validates: Requirements 1.4**
+  - [x] 3.4 Implement anomaly classification
+    - Create classifyAnomaly function based on intensity and spatial characteristics
+    - Return AnomalyClassification type
+    - _Requirements: 6.3_
+  - [ ]* 3.5 Write property test for anomaly classification determinism
+    - **Property 8: Anomaly Classification Determinism**
+    - **Validates: Requirements 6.3**
+  - [x] 3.6 Implement anomaly proximity grouping
+    - Create groupAnomaliesByProximity function
+    - Group anomalies within threshold distance
+    - _Requirements: 6.4_
+  - [ ]* 3.7 Write property test for anomaly proximity grouping
+    - **Property 9: Anomaly Proximity Grouping**
+    - **Validates: Requirements 6.4**
+
+- [x] 4. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 5. Implement Narrative Engine
+  - [x] 5.1 Implement narrative generation from geological layer
+    - Create generateNarrative function
+    - Extract era, material, fossil data for prompt construction
+    - Generate flora, fauna, climate arrays based on era
+    - _Requirements: 2.1, 2.3_
+  - [ ]* 5.2 Write property test for narrative content completeness
+    - **Property 3: Narrative Content Completeness**
+    - **Validates: Requirements 2.3, 2.4**
+  - [x] 5.3 Implement era-appropriate content lookup
+    - Create getEraFlora and getEraFauna functions
+    - Map geological eras to appropriate species
+    - Handle fossil index emphasis for high/exceptional values
+    - _Requirements: 2.3, 2.4_
+
+- [ ] 6. Implement Cache Manager
+  - [x] 6.1 Implement JSON serialization for CachedLocation
+    - Create serializeCachedLocation function
+    - Include schemaVersion in output
+    - Handle Date serialization to ISO-8601
+    - _Requirements: 8.1, 8.2_
+  - [x] 6.2 Implement JSON deserialization for CachedLocation
+    - Create deserializeCachedLocation function
+    - Parse ISO-8601 dates back to Date objects
+    - Validate schemaVersion compatibility
+    - _Requirements: 8.3_
+  - [ ]* 6.3 Write property test for cache serialization round-trip
+    - **Property 12: Cache Serialization Round-Trip**
+    - **Validates: Requirements 8.2, 8.3**
+  - [x] 6.4 Implement cache storage and retrieval
+    - Create CacheManager class with store/retrieve methods
+    - Generate cache keys from coordinates
+    - Track cachedAt and lastAccessed timestamps
+    - _Requirements: 2.5, 8.1, 8.3_
+  - [ ]* 6.5 Write property test for narrative cache persistence
+    - **Property 4: Narrative Cache Persistence**
+    - **Validates: Requirements 2.5**
+  - [ ]* 6.6 Write property test for cache metadata presence
+    - **Property 13: Cache Metadata Presence**
+    - **Validates: Requirements 8.4**
+  - [x] 6.7 Implement storage usage tracking and threshold detection
+    - Create getStorageUsage function
+    - Implement threshold check (90% capacity)
+    - _Requirements: 8.5_
+  - [ ]* 6.8 Write property test for storage threshold detection
+    - **Property 14: Storage Threshold Detection**
+    - **Validates: Requirements 8.5**
+
+- [x] 7. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 8. Implement Time Slider Controller
+  - [x] 8.1 Implement time position to era mapping
+    - Create getEraForTimePosition function
+    - Map yearsAgo to GeologicalEra
+    - Calculate depth indicator from time position
+    - _Requirements: 4.2_
+  - [ ]* 8.2 Write property test for time slider position mapping
+    - **Property 6: Time Slider Position Mapping**
+    - **Validates: Requirements 4.2, 4.3**
+  - [x] 8.3 Implement era boundary snapping
+    - Create snapToEraBoundary function
+    - Find nearest era boundary by minimum distance
+    - _Requirements: 4.5_
+  - [ ]* 8.4 Write property test for era boundary snapping
+    - **Property 7: Era Boundary Snapping**
+    - **Validates: Requirements 4.5**
+  - [x] 8.5 Implement TimeSliderController class
+    - Wire up setTimePosition, getTimePosition methods
+    - Implement onTimeChange callback registration
+    - _Requirements: 4.2, 4.3, 4.5_
+
+- [x] 9. Implement Scene Composition
+  - [x] 9.1 Implement era-appropriate scene builder
+    - Create buildSceneForEra function
+    - Filter object types based on yearsAgo value
+    - Include/exclude structures, utilities, creatures appropriately
+    - _Requirements: 3.4, 3.5, 3.6_
+  - [ ]* 9.2 Write property test for era-appropriate scene composition
+    - **Property 5: Era-Appropriate Scene Composition**
+    - **Validates: Requirements 3.4, 3.5, 3.6**
+  - [x] 9.3 Implement placeholder scene generation
+    - Create renderPlaceholder function
+    - Set isPlaceholder flag to true
+    - Generate generic era-appropriate content
+    - _Requirements: 7.1, 7.3_
+  - [ ]* 9.4 Write property test for placeholder scene indication
+    - **Property 11: Placeholder Scene Indication**
+    - **Validates: Requirements 7.3**
+
+- [x] 10. Implement Ghost Layer Management
+  - [x] 10.1 Implement Ghost Layer visibility toggle
+    - Create GhostLayerManager class
+    - Implement enable/disable methods
+    - Track anomaly overlay visibility state
+    - _Requirements: 6.5_
+  - [ ]* 10.2 Write property test for ghost layer state isolation
+    - **Property 10: Ghost Layer State Isolation**
+    - **Validates: Requirements 6.5**
+
+- [x] 11. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 12. Implement Mode Manager
+  - [x] 12.1 Implement mode configuration definitions
+    - Create getModeConfiguration function
+    - Define priorityDataTypes for each mode
+    - Define visibleUIElements and hiddenUIElements per mode
+    - _Requirements: 9.1, 9.2, 9.3, 9.5_
+  - [ ]* 12.2 Write property test for mode configuration correctness
+    - **Property 15: Mode Configuration Correctness**
+    - **Validates: Requirements 9.1, 9.2, 9.3**
+  - [ ]* 12.3 Write property test for mode-specific UI configuration
+    - **Property 17: Mode-Specific UI Configuration**
+    - **Validates: Requirements 9.5**
+  - [x] 12.4 Implement ModeManager class with state preservation
+    - Create setMode method that preserves location and time
+    - Implement getMode and getModeConfig methods
+    - _Requirements: 9.4_
+  - [ ]* 12.5 Write property test for mode switch state preservation
+    - **Property 16: Mode Switch State Preservation**
+    - **Validates: Requirements 9.4**
+
+- [x] 13. Implement Scan Manager Integration
+  - [x] 13.1 Implement ScanManager class
+    - Create startScan method coordinating sensors
+    - Implement getStatus for scan state tracking
+    - Handle LiDAR fallback for non-Pro devices
+    - _Requirements: 1.1, 1.5_
+  - [x] 13.2 Implement Data Query Service
+    - Create queryGeology method for API calls
+    - Integrate with CacheManager for caching
+    - Handle network errors gracefully
+    - _Requirements: 1.2, 2.5_
+
+- [x] 14. Implement Render Engine Integration
+  - [x] 14.1 Implement RenderEngine interface adapter
+    - Create renderEra method connecting to game engine
+    - Implement transitionToEra for smooth transitions
+    - Wire up renderAnomalies for Ghost Layer
+    - _Requirements: 3.1, 3.2, 3.3, 6.2_
+  - [x] 14.2 Implement progressive loading with placeholder replacement
+    - Create scene update logic for data streaming
+    - Replace placeholder content as accurate data arrives
+    - _Requirements: 7.1, 7.2_
+
+- [x] 15. Final Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.

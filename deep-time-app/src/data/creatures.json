@@ -1,0 +1,184 @@
+{
+  "creatures": {
+    "Cretaceous": [
+      {
+        "id": "trex",
+        "name": "Tyrannosaurus Rex",
+        "scientificName": "Tyrannosaurus rex",
+        "era": "Cretaceous",
+        "period": "Late Cretaceous",
+        "modelUrl": "/models/trex.glb",
+        "thumbnailUrl": "/thumbnails/trex.svg",
+        "scale": 12.0,
+        "animations": ["idle", "walk", "roar"],
+        "description": "The king of dinosaurs, a massive predator with powerful jaws capable of crushing bone",
+        "diet": "carnivore",
+        "size": "massive"
+      },
+      {
+        "id": "triceratops",
+        "name": "Triceratops",
+        "scientificName": "Triceratops horridus",
+        "era": "Cretaceous",
+        "period": "Late Cretaceous",
+        "modelUrl": "/models/triceratops.glb",
+        "thumbnailUrl": "/thumbnails/triceratops.svg",
+        "scale": 9.0,
+        "animations": ["idle", "walk", "graze"],
+        "description": "Three-horned herbivore with a distinctive frill, one of the last non-avian dinosaurs",
+        "diet": "herbivore",
+        "size": "large"
+      },
+      {
+        "id": "velociraptor",
+        "name": "Velociraptor",
+        "scientificName": "Velociraptor mongoliensis",
+        "era": "Cretaceous",
+        "period": "Late Cretaceous",
+        "modelUrl": "/models/velociraptor.glb",
+        "thumbnailUrl": "/thumbnails/velociraptor.svg",
+        "scale": 2.0,
+        "animations": ["idle", "walk", "attention"],
+        "description": "Swift feathered predator known for its intelligence and deadly sickle-shaped claws",
+        "diet": "carnivore",
+        "size": "small"
+      }
+    ],
+    "Jurassic": [
+      {
+        "id": "brachiosaurus",
+        "name": "Brachiosaurus",
+        "scientificName": "Brachiosaurus altithorax",
+        "era": "Jurassic",
+        "period": "Late Jurassic",
+        "modelUrl": "/models/brachiosaurus.glb",
+        "thumbnailUrl": "/thumbnails/brachiosaurus.svg",
+        "scale": 25.0,
+        "animations": ["idle", "walk", "eat"],
+        "description": "Towering long-necked herbivore that could reach treetops over 12 meters high",
+        "diet": "herbivore",
+        "size": "massive"
+      },
+      {
+        "id": "stegosaurus",
+        "name": "Stegosaurus",
+        "scientificName": "Stegosaurus stenops",
+        "era": "Jurassic",
+        "period": "Late Jurassic",
+        "modelUrl": "/models/stegosaurus.glb",
+        "thumbnailUrl": "/thumbnails/stegosaurus.svg",
+        "scale": 9.0,
+        "animations": ["idle", "walk", "graze"],
+        "description": "Armored herbivore with distinctive back plates and spiked tail for defense",
+        "diet": "herbivore",
+        "size": "large"
+      },
+      {
+        "id": "allosaurus",
+        "name": "Allosaurus",
+        "scientificName": "Allosaurus fragilis",
+        "era": "Jurassic",
+        "period": "Late Jurassic",
+        "modelUrl": "/models/allosaurus.glb",
+        "thumbnailUrl": "/thumbnails/allosaurus.svg",
+        "scale": 8.5,
+        "animations": ["idle", "walk", "roar"],
+        "description": "Apex predator of the Jurassic, a powerful theropod with serrated teeth",
+        "diet": "carnivore",
+        "size": "large"
+      }
+    ],
+    "Pleistocene": [
+      {
+        "id": "mammoth",
+        "name": "Woolly Mammoth",
+        "scientificName": "Mammuthus primigenius",
+        "era": "Pleistocene",
+        "period": "Ice Age",
+        "modelUrl": "/models/mammoth.glb",
+        "thumbnailUrl": "/thumbnails/mammoth.svg",
+        "scale": 4.0,
+        "animations": ["idle", "walk", "trumpet"],
+        "description": "Ice age elephant with thick fur and curved tusks, adapted to frigid climates",
+        "diet": "herbivore",
+        "size": "large"
+      },
+      {
+        "id": "sabertooth",
+        "name": "Saber-toothed Cat",
+        "scientificName": "Smilodon fatalis",
+        "era": "Pleistocene",
+        "period": "Ice Age",
+        "modelUrl": "/models/sabertooth.glb",
+        "thumbnailUrl": "/thumbnails/sabertooth.svg",
+        "scale": 1.2,
+        "animations": ["idle", "walk", "roar"],
+        "description": "Fearsome predator with elongated canine teeth up to 28 centimeters long",
+        "diet": "carnivore",
+        "size": "medium"
+      },
+      {
+        "id": "megatherium",
+        "name": "Giant Ground Sloth",
+        "scientificName": "Megatherium americanum",
+        "era": "Pleistocene",
+        "period": "Ice Age",
+        "modelUrl": "/models/megatherium.glb",
+        "thumbnailUrl": "/thumbnails/megatherium.svg",
+        "scale": 6.0,
+        "animations": ["idle", "walk", "eat"],
+        "description": "Massive ground-dwelling sloth that could stand on hind legs to reach vegetation",
+        "diet": "herbivore",
+        "size": "large"
+      }
+    ],
+    "Triassic": [
+      {
+        "id": "coelophysis",
+        "name": "Coelophysis",
+        "scientificName": "Coelophysis bauri",
+        "era": "Triassic",
+        "period": "Late Triassic",
+        "modelUrl": "/models/coelophysis.glb",
+        "thumbnailUrl": "/thumbnails/coelophysis.svg",
+        "scale": 3.0,
+        "animations": ["idle", "walk", "attention"],
+        "description": "One of the earliest dinosaurs, a swift and agile predator",
+        "diet": "carnivore",
+        "size": "small"
+      }
+    ],
+    "Permian": [
+      {
+        "id": "dimetrodon",
+        "name": "Dimetrodon",
+        "scientificName": "Dimetrodon grandis",
+        "era": "Permian",
+        "period": "Early Permian",
+        "modelUrl": "/models/dimetrodon.glb",
+        "thumbnailUrl": "/thumbnails/dimetrodon.svg",
+        "scale": 3.5,
+        "animations": ["idle", "walk", "attention"],
+        "description": "Sail-backed synapsid, more closely related to mammals than dinosaurs",
+        "diet": "carnivore",
+        "size": "medium"
+      }
+    ],
+    "Carboniferous": [
+      {
+        "id": "meganeura",
+        "name": "Meganeura",
+        "scientificName": "Meganeura monyi",
+        "era": "Carboniferous",
+        "period": "Late Carboniferous",
+        "modelUrl": "/models/meganeura.glb",
+        "thumbnailUrl": "/thumbnails/meganeura.svg",
+        "scale": 0.7,
+        "animations": ["idle", "walk"],
+        "description": "Giant dragonfly-like insect with a wingspan of up to 70 centimeters",
+        "diet": "carnivore",
+        "size": "small"
+      }
+    ]
+  }
+}

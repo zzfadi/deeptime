@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <rect width="192" height="192" fill="#1a1a2e"/>
+  <defs>
+    <linearGradient id="earthGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4a3d2d"/>
+      <stop offset="30%" style="stop-color:#6b5b4f"/>
+      <stop offset="60%" style="stop-color:#8b7355"/>
+      <stop offset="100%" style="stop-color:#a0826d"/>
+    </linearGradient>
+  </defs>
+  <circle cx="96" cy="96" r="70" fill="url(#earthGrad)" stroke="#3d3d5c" stroke-width="4"/>
+  <path d="M40 65 Q96 50 152 65" stroke="#3d4a2d" stroke-width="3" fill="none" opacity="0.7"/>
+  <path d="M35 96 Q96 80 157 96" stroke="#4a3d2d" stroke-width="3" fill="none" opacity="0.7"/>
+  <path d="M40 127 Q96 110 152 127" stroke="#2d4a3e" stroke-width="3" fill="none" opacity="0.7"/>
+</svg>

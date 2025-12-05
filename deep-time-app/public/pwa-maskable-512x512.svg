@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Maskable icon with safe zone padding (10% on each side = 51.2px) -->
+  <rect width="512" height="512" fill="#1a1a2e"/>
+  <defs>
+    <linearGradient id="earthGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4a3d2d"/>
+      <stop offset="30%" style="stop-color:#6b5b4f"/>
+      <stop offset="60%" style="stop-color:#8b7355"/>
+      <stop offset="100%" style="stop-color:#a0826d"/>
+    </linearGradient>
+  </defs>
+  <!-- Smaller circle to fit within maskable safe zone -->
+  <circle cx="256" cy="256" r="150" fill="url(#earthGrad)" stroke="#3d3d5c" stroke-width="6"/>
+  <path d="M130 185 Q256 155 382 185" stroke="#3d4a2d" stroke-width="5" fill="none" opacity="0.7"/>
+  <path d="M120 256 Q256 220 392 256" stroke="#4a3d2d" stroke-width="5" fill="none" opacity="0.7"/>
+  <path d="M130 327 Q256 295 382 327" stroke="#2d4a3e" stroke-width="5" fill="none" opacity="0.7"/>
+</svg>

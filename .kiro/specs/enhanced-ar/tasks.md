@@ -1,0 +1,160 @@
+# Implementation Plan
+
+- [x] 1. Set up AR infrastructure
+  - [x] 1.1 Create AR module structure
+    - Create `src/ar/` directory with index.ts
+    - Define TypeScript interfaces for AR components
+    - _Requirements: 1.1, 1.2_
+  - [x] 1.2 Implement ARSessionManager
+    - Initialize WebXR with 'immersive-ar' mode and camera passthrough
+    - Implement hit-test for ground plane detection
+    - Handle session lifecycle (start, end, error)
+    - _Requirements: 1.2, 1.3_
+  - [ ]* 1.3 Write property test for ground plane anchoring
+    - **Property 1: Ground Plane Anchoring**
+    - **Validates: Requirements 1.3**
+  - [x] 1.4 Implement AR fallback detection
+    - Check WebXR support and camera permissions
+    - Route to card-based view when AR unavailable
+    - _Requirements: 1.4, 1.5_
+
+- [x] 2. Implement Creature System
+  - [x] 2.1 Create creature data manifest
+    - Define creature JSON schema with era mappings
+    - Add initial creatures for Cretaceous, Jurassic, Pleistocene
+    - Include model URLs, scales, and animation names
+    - _Requirements: 2.1_
+  - [x] 2.2 Implement CreatureManager
+    - Load GLTF models with Three.js GLTFLoader
+    - Initialize AnimationMixer for each creature
+    - Implement spawn/despawn with ground plane positioning
+    - _Requirements: 2.1, 2.2, 2.4_
+  - [ ]* 2.3 Write property test for era-creature mapping
+    - **Property 2: Era-Creature Mapping Consistency**
+    - **Validates: Requirements 2.1**
+  - [ ]* 2.4 Write property test for default animation state
+    - **Property 3: Default Animation State**
+    - **Validates: Requirements 2.2**
+  - [x] 2.5 Implement creature scaling and distribution
+    - Scale creatures to real-world dimensions
+    - Distribute creatures across ground plane without overlap
+    - _Requirements: 2.4, 2.5_
+  - [ ]* 2.6 Write property test for creature distribution
+    - **Property 5: Creature Distribution Non-Overlap**
+    - **Validates: Requirements 2.5**
+  - [x] 2.7 Implement creature interaction
+    - Detect tap/click on creature meshes
+    - Trigger interaction animation on tap
+    - _Requirements: 2.3_
+
+- [x] 3. Checkpoint - AR with creatures working
+  - Ensure all tests pass, ask the user if questions arise
+
+- [x] 4. Implement Era Transitions
+  - [x] 4.1 Create EraTransitionController
+    - Implement transition state machine
+    - Lock time slider during transitions
+    - _Requirements: 3.1, 3.5_
+  - [ ]* 4.2 Write property test for slider lock during transition
+    - **Property 8: Slider Lock During Transition**
+    - **Validates: Requirements 3.5**
+  - [x] 4.3 Implement transition shader effects
+    - Create dissolve shader for going to past
+    - Create emerge shader for going to future
+    - Animate shader uniforms over 1-2 seconds
+    - _Requirements: 3.2, 3.3_
+  - [ ]* 4.4 Write property test for transition effect direction
+    - **Property 7: Transition Effect Direction**
+    - **Validates: Requirements 3.2, 3.3**
+  - [ ]* 4.5 Write property test for transition duration
+    - **Property 6: Transition Duration Bounds**
+    - **Validates: Requirements 3.1**
+  - [x] 4.6 Implement creature swap on transition
+    - Fade out current creatures
+    - Load and fade in new era creatures
+    - _Requirements: 3.4_
+
+- [x] 5. Implement Haptic Feedback
+  - [x] 5.1 Create HapticController service
+    - Wrap Vibration API with intensity levels
+    - Implement pulseEraBoundary and pulseConfirm
+    - Handle unsupported devices gracefully
+    - _Requirements: 5.1, 5.2, 5.3, 5.4_
+  - [ ]* 5.2 Write property test for haptic boundary trigger
+    - **Property 10: Haptic Boundary Trigger**
+    - **Validates: Requirements 5.1**
+  - [x] 5.3 Integrate haptics with time slider
+    - Detect era boundary crossings
+    - Trigger appropriate haptic intensity
+    - _Requirements: 5.1, 5.2_
+  - [ ]* 5.4 Write property test for haptic intensity mapping
+    - **Property 11: Haptic Intensity Mapping**
+    - **Validates: Requirements 5.2**
+
+- [x] 6. Implement AI Narration
+  - [x] 6.1 Enhance narration service for creatures
+    - Add creature-specific prompt template
+    - Generate contextual narration on creature tap
+    - _Requirements: 4.1, 4.2_
+  - [ ]* 6.2 Write property test for creature-specific narration
+    - **Property 9: Creature-Specific Narration**
+    - **Validates: Requirements 4.2**
+  - [x] 6.3 Create narration toast component
+    - Display narration text overlay
+    - Auto-dismiss after reading time
+    - Dismiss on tap
+    - _Requirements: 4.3, 4.4_
+  - [x] 6.4 Add fallback narrations
+    - Pre-write narrations for each creature
+    - Use fallback when Gemini unavailable
+    - _Requirements: 4.5_
+
+- [x] 7. Implement AR UI Overlay
+  - [x] 7.1 Create ARTimeSlider component
+    - Compact vertical slider for AR view
+    - Position on left edge of screen
+    - _Requirements: 6.1_
+  - [x] 7.2 Create AROverlay component
+    - Era name and date display at top
+    - Exit button to return to card view
+    - _Requirements: 6.2, 6.3_
+  - [x] 7.3 Implement UI fade on idle
+    - Track touch events and idle time
+    - Fade UI to 50% after 5 seconds idle
+    - Restore on touch
+    - _Requirements: 6.4, 6.5_
+  - [ ]* 7.4 Write property test for UI fade on idle
+    - **Property 12: UI Fade on Idle**
+    - **Validates: Requirements 6.4**
+
+- [x] 8. Integrate Enhanced AR into App
+  - [x] 8.1 Update App routing
+    - Add AR view as primary mode when supported
+    - Keep card view as fallback
+    - _Requirements: 1.1, 1.4, 1.5_
+  - [x] 8.2 Connect AR view to app state
+    - Sync era selection with time slider
+    - Sync location with geological data
+    - _Requirements: 1.1_
+  - [x] 8.3 Add AR entry point from card view
+    - "Enter AR" button on era detail page
+    - Smooth transition to AR mode
+    - _Requirements: 1.1_
+
+- [x] 9. Add 3D Models
+  - [x] 9.1 Source and add creature models
+    - Download free GLTF models from Sketchfab/Poly Pizza
+    - Compress with Draco
+    - Add to public/models/
+    - _Requirements: 2.1_
+  - [x] 9.2 Configure model manifest
+    - Map models to eras in creatures.json
+    - Set accurate real-world scales
+    - List available animations
+    - _Requirements: 2.1, 2.4_
+
+- [x] 10. Final Checkpoint - Enhanced AR Complete
+  - Ensure all tests pass
+  - Test AR on iOS Safari and Android Chrome
+  - Verify creature animations and transitions
+  - Ask the user if questions arise

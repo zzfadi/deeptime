@@ -1,0 +1,39 @@
+/**
+ * UI Components Index
+ * Exports all UI components for the DeepTime PWA
+ * 
+ * Note: ARView is NOT exported here to enable code splitting.
+ * Import it directly with React.lazy() where needed.
+ */
+
+export { LocationHeader } from './LocationHeader';
+export type { LocationHeaderProps } from './LocationHeader';
+
+export { TimeSlider, formatYearsAgo, mapTimeToEra } from './TimeSlider';
+export type { TimeSliderProps, EraBoundary } from './TimeSlider';
+
+export { EraCard, getEraBackground, getEraIcon } from './EraCard';
+export type { EraCardProps } from './EraCard';
+
+export { LoadingSpinner, FullPageSpinner } from './LoadingSpinner';
+export type { LoadingSpinnerProps } from './LoadingSpinner';
+
+// ARView is lazy-loaded in EraDetail.tsx for code splitting (Three.js is large)
+// Only export the type for type checking
+export type { ARViewProps } from './ARView';
+
+export { OnlineStatusToast } from './OnlineStatusToast';
+export type { OnlineStatusToastProps } from './OnlineStatusToast';
+
+export { InstallBanner } from './InstallBanner';
+export type { InstallBannerProps } from './InstallBanner';
+
+export { NarrationToast } from './NarrationToast';
+export type { NarrationToastProps } from './NarrationToast';
+
+// AR UI Overlay components - Requirements: 6.1, 6.2, 6.3
+export { ARTimeSlider } from './ARTimeSlider';
+export type { ARTimeSliderProps, AREraBoundary } from './ARTimeSlider';
+
+export { AROverlay } from './AROverlay';
+export type { AROverlayProps } from './AROverlay';

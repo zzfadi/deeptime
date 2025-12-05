@@ -1,0 +1,149 @@
+# Implementation Plan
+
+- [x] 1. Set up PWA project structure
+  - [x] 1.1 Initialize Vite + React + TypeScript project
+    - Create new directory `deep-time-app` at workspace root
+    - Run `npm create vite@latest` with React + TypeScript template
+    - Install dependencies: tailwindcss, zustand, firebase, @google/generative-ai
+    - Link deep-time-core as local dependency
+    - _Requirements: N/A (infrastructure)_
+  - [x] 1.2 Configure Tailwind CSS
+    - Install and initialize Tailwind
+    - Set up dark theme optimized for mobile
+    - _Requirements: N/A (infrastructure)_
+  - [x] 1.3 Configure PWA manifest and service worker
+    - Create manifest.json with app metadata and icons
+    - Set up vite-plugin-pwa for service worker generation
+    - Configure offline caching strategy
+    - _Requirements: 6.1, 6.2, 6.3_
+
+- [ ] 2. Implement Core Services
+  - [x] 2.1 Create location service
+    - Implement getCurrentPosition using Geolocation API
+    - Implement searchLocation using geocoding API
+    - Handle permission denied gracefully
+    - _Requirements: 1.1, 1.4_
+  - [x] 2.2 Create geological data service
+    - Implement USGS API integration
+    - Use parseGeologicalResponse from core library
+    - Implement local caching with IndexedDB
+    - _Requirements: 1.2, 1.3_
+  - [x] 2.3 Create narrative service with Gemini integration
+    - Set up Gemini API client
+    - Implement generateNarrative with prompt template
+    - Create fallback narratives for each era
+    - _Requirements: 2.1, 2.2, 2.4_
+  - [x] 2.4 Create Firebase service
+    - Initialize Firebase with config
+    - Implement saveLocation and getLocations
+    - Handle offline sync
+    - _Requirements: 2.5, 5.1_
+
+- [x] 3. Implement State Management
+  - [x] 3.1 Create Zustand app store
+    - Define AppState interface
+    - Implement location actions
+    - Implement era navigation actions
+    - Implement loading/error states
+    - _Requirements: 1.1, 3.1, 3.2_
+
+- [x] 4. Implement UI Components
+  - [x] 4.1 Create LocationHeader component
+    - Display current coordinates or "Locating..."
+    - Search button for manual entry
+    - Offline indicator
+    - _Requirements: 1.1, 1.4, 5.3_
+  - [x] 4.2 Create TimeSlider component
+    - Vertical slider with era markers
+    - Visual feedback on drag
+    - Snap to era boundaries on release
+    - _Requirements: 3.1, 3.2, 3.3, 3.4_
+  - [ ]* 4.3 Write property test for time slider era mapping
+    - **Property 6: Time Slider Era Mapping**
+    - **Validates: Requirements 3.2**
+  - [x] 4.4 Create EraCard component
+    - Era name and yearsAgo display
+    - Narrative text with flora/fauna
+    - Loading skeleton state
+    - Background image based on era
+    - _Requirements: 2.2, 4.1, 4.2, 4.3_
+  - [ ]* 4.5 Write property test for era-appropriate visuals
+    - **Property 8: Era-Appropriate Visuals**
+    - **Validates: Requirements 4.1, 4.2, 4.3**
+  - [x] 4.6 Create LoadingSpinner component
+    - Animated spinner for loading states
+    - _Requirements: N/A (UX)_
+
+- [x] 5. Implement Main Pages
+  - [x] 5.1 Create Home page
+    - Request location on mount
+    - Display geological stack summary
+    - Time slider integration
+    - Current era card
+    - _Requirements: 1.1, 1.2, 3.1_
+  - [x] 5.2 Create EraDetail page
+    - Full narrative display
+    - Flora/fauna lists
+    - Climate information
+    - AR button (if WebXR supported)
+    - _Requirements: 2.2, 4.1, 4.4_
+  - [x] 5.3 Create error and fallback states
+    - GPS denied view with search
+    - API error view with retry
+    - Offline view with cached locations
+    - _Requirements: 1.4, 1.5, 2.4, 5.3_
+
+- [x] 6. Checkpoint - Ensure app runs and basic flow works
+  - Ensure app builds without errors
+  - Test location → geological data → narrative flow manually
+  - Ask the user if questions arise
+
+- [x] 7. Implement WebXR AR View (Optional Enhancement)
+  - [x] 7.1 Create ARView component with Three.js
+    - Initialize WebXR session
+    - Render simple era-appropriate 3D scene
+    - Exit button overlay
+    - _Requirements: 4.4_
+  - [x] 7.2 Implement WebXR feature detection
+    - Check navigator.xr availability
+    - Show/hide AR button based on support
+    - _Requirements: 4.5_
+  - [ ]* 7.3 Write property test for WebXR graceful degradation
+    - **Property 9: WebXR Graceful Degradation**
+    - **Validates: Requirements 4.5**
+
+- [x] 8. Implement Caching and Offline Support
+  - [x] 8.1 Implement IndexedDB caching layer
+    - Store geological stacks locally
+    - Store narratives locally
+    - Coordinate-based cache keys
+    - _Requirements: 5.1, 5.2_
+  - [ ]* 8.2 Write property test for cache persistence
+    - **Property 10: Cache Persistence**
+    - **Validates: Requirements 5.1, 5.2**
+  - [x] 8.3 Implement offline detection and UI
+    - Listen for online/offline events
+    - Show offline indicator in header
+    - Filter to cached locations when offline
+    - _Requirements: 5.3, 6.3_
+
+- [x] 9. Final Polish and PWA Optimization
+  - [x] 9.1 Add app icons and splash screens
+    - Generate icon sizes for iOS and Android
+    - Configure splash screen in manifest
+    - _Requirements: 6.1, 6.2_
+  - [x] 9.2 Optimize bundle size
+    - Code splitting for AR view
+    - Lazy load non-critical components
+    - _Requirements: N/A (performance)_
+  - [x] 9.3 Test PWA installation flow
+    - Verify install prompt appears
+    - Test standalone mode launch
+    - _Requirements: 6.1, 6.2_
+
+- [x] 10. Final Checkpoint - MVP Complete
+  - Ensure all tests pass
+  - Verify app works on iPhone and Android browsers
+  - Test offline functionality
+  - Ask the user if questions arise
+
