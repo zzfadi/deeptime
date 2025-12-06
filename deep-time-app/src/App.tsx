@@ -21,10 +21,14 @@ const EraDetail = lazy(() => import('./pages/EraDetail'));
 const ARView = lazy(() => import('./components/ARView'));
 const IOSARView = lazy(() => import('./components/IOSARView'));
 
+// Lazy load AIDashboard for code splitting
+// Requirement 2.2: Navigate to dashboard view when button clicked
+const AIDashboard = lazy(() => import('./components/AIDashboard'));
+
 // Import iOS detection
 import { isIOS } from './utils/iosARDetection';
 
-type Page = 'home' | 'era-detail' | 'ar';
+type Page = 'home' | 'era-detail' | 'ar' | 'dashboard';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
@@ -143,6 +147,18 @@ function App() {
     arFallbackDetector.setCardViewFallback();
   }, [setViewMode]);
 
+  // Handle navigating to dashboard
+  // Requirement 2.2: Navigate to dashboard view when button clicked
+  const handleDashboardClick = useCallback(() => {
+    setCurrentPage('dashboard');
+  }, []);
+
+  // Handle navigating back from dashboard
+  // Requirement 2.3: Back button to return to main app
+  const handleDashboardBack = useCallback(() => {
+    setCurrentPage('home');
+  }, []);
+
   // Render current page with Suspense for lazy-loaded components
   switch (currentPage) {
     case 'ar':
@@ -196,12 +212,34 @@ function App() {
         </Suspense>
       );
     
+    case 'dashboard':
+      // AI Dashboard view
+      // Requirement 2.2: Navigate to dashboard view when button clicked
+      return (
+        <Suspense fallback={
+          <div className="min-h-screen bg-deep-900 flex items-center justify-center">
+            <FullPageSpinner label="Loading dashboard..." />
+          </div>
+        }>
+          <AIDashboard onBack={handleDashboardBack} />
+        </Suspense>
+      );
+
     case 'home':
     default:
       return (
         <>
           <Home onViewEraDetail={handleViewEraDetail} />
           <InstallBanner />
+          
+          {/* Dashboard button - Requirement 2.1: Display dashboard access button */}
+          <button
+            onClick={handleDashboardClick}
+            className="fixed bottom-4 right-20 z-40 w-12 h-12 bg-slate-800/90 hover:bg-slate-700 rounded-full flex items-center justify-center shadow-lg border border-slate-700 transition-colors"
+            title="AI Dashboard"
+          >
+            <span className="text-xl">📊</span>
+          </button>
           
           {/* Settings button - always visible */}
           <button

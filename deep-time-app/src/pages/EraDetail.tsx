@@ -254,16 +254,22 @@ function GeneratedImageDisplay({
   // Show error state with friendly message
   if (error) {
     return (
-      <div className="bg-red-900/20 rounded-xl p-6 mb-6 text-center border border-red-500/30">
-        <div className="text-4xl mb-3">😕</div>
-        <p className="text-red-300 text-sm mb-2">Oops! We couldn't create the image</p>
-        <p className="text-gray-400 text-xs mb-4">{error}</p>
-        <button
-          onClick={onGenerate}
-          className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm"
-        >
-          Try Again
-        </button>
+      <div className="relative mb-6 overflow-hidden rounded-lg border border-red-900/40 bg-gradient-to-br from-red-950/40 to-red-900/20 backdrop-blur-sm">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(220,38,38,0.1),transparent_50%)]" />
+        <div className="relative p-5 text-center">
+          <div className="mb-3 text-3xl opacity-60">⚠</div>
+          <p className="mb-1 text-sm font-medium text-red-200">Image generation failed</p>
+          <p className="mb-4 text-xs leading-relaxed text-red-300/70">{error}</p>
+          <button
+            onClick={onGenerate}
+            className="inline-flex items-center gap-2 rounded-md bg-red-900/50 px-4 py-2 text-xs font-medium text-red-100 transition-all hover:bg-red-900/70 active:scale-95"
+          >
+            <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Try Again
+          </button>
+        </div>
       </div>
     );
   }
@@ -271,16 +277,22 @@ function GeneratedImageDisplay({
   // Show message when cached blob is corrupted
   if (blobError && image) {
     return (
-      <div className="bg-yellow-900/20 rounded-xl p-6 mb-6 text-center border border-yellow-500/30">
-        <div className="text-4xl mb-3">🔄</div>
-        <p className="text-yellow-300 text-sm mb-2">Cached image needs refresh</p>
-        <p className="text-gray-400 text-xs mb-4">The saved image data was corrupted. Click to regenerate.</p>
-        <button
-          onClick={onGenerate}
-          className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg transition-colors text-sm"
-        >
-          Regenerate Image
-        </button>
+      <div className="relative mb-6 overflow-hidden rounded-lg border border-amber-900/40 bg-gradient-to-br from-amber-950/40 to-amber-900/20 backdrop-blur-sm">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(217,119,6,0.1),transparent_50%)]" />
+        <div className="relative p-5 text-center">
+          <div className="mb-3 text-3xl opacity-60">🔄</div>
+          <p className="mb-1 text-sm font-medium text-amber-200">Cached image corrupted</p>
+          <p className="mb-4 text-xs leading-relaxed text-amber-300/70">The saved image data needs to be regenerated</p>
+          <button
+            onClick={onGenerate}
+            className="inline-flex items-center gap-2 rounded-md bg-amber-900/50 px-4 py-2 text-xs font-medium text-amber-100 transition-all hover:bg-amber-900/70 active:scale-95"
+          >
+            <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Regenerate
+          </button>
+        </div>
       </div>
     );
   }
@@ -288,10 +300,13 @@ function GeneratedImageDisplay({
   // Show loading state
   if (isLoading) {
     return (
-      <div className="bg-deep-700/50 rounded-xl p-8 mb-6 text-center">
-        <LoadingSpinner size="md" />
-        <p className="text-gray-300 text-sm mt-3">Creating a visualization of this era...</p>
-        <p className="text-gray-500 text-xs mt-1">This usually takes 5-10 seconds</p>
+      <div className="relative mb-6 overflow-hidden rounded-lg border border-slate-700/40 bg-gradient-to-br from-slate-900/60 to-slate-800/40 backdrop-blur-sm">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(148,163,184,0.08),transparent_50%)]" />
+        <div className="relative p-8 text-center">
+          <LoadingSpinner size="md" />
+          <p className="mt-3 text-sm font-medium text-slate-200">Generating visualization...</p>
+          <p className="mt-1 text-xs text-slate-400">Usually takes 5-10 seconds</p>
+        </div>
       </div>
     );
   }
@@ -299,15 +314,20 @@ function GeneratedImageDisplay({
   // Show image if available
   if (imageUrl) {
     return (
-      <div className="mb-6 rounded-xl overflow-hidden shadow-lg">
-        <img
-          src={imageUrl}
-          alt="AI-generated era visualization"
-          className="w-full h-auto object-cover"
-          loading="lazy"
-        />
-        <div className="bg-deep-800/80 px-3 py-2 text-xs text-gray-400">
-          AI-generated visualization • {image?.modelUsed}
+      <div className="group relative mb-6 overflow-hidden rounded-lg border border-slate-700/30 bg-black/20 shadow-2xl">
+        <div className="aspect-[16/10] overflow-hidden">
+          <img
+            src={imageUrl}
+            alt="AI-generated era visualization"
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            loading="lazy"
+          />
+        </div>
+        <div className="border-t border-slate-700/30 bg-gradient-to-r from-slate-900/90 to-slate-800/90 px-3 py-2 backdrop-blur-sm">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-medium text-slate-300">AI Visualization</span>
+            <span className="text-slate-500">{image?.modelUsed}</span>
+          </div>
         </div>
       </div>
     );
@@ -315,18 +335,29 @@ function GeneratedImageDisplay({
 
   // Show generate button (default state)
   return (
-    <div className="bg-gradient-to-br from-blue-900/30 to-purple-900/30 rounded-xl p-6 mb-6 text-center border border-blue-500/20">
-      <div className="text-4xl mb-3">🎨</div>
-      <h4 className="text-white font-medium mb-2">Visualize This Era</h4>
-      <p className="text-gray-400 text-sm mb-4">
-        Generate an AI image showing what this location looked like millions of years ago
-      </p>
-      <button
-        onClick={onGenerate}
-        className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl transition-all font-medium shadow-lg hover:shadow-xl"
-      >
-        ✨ Generate Image
-      </button>
+    <div className="group relative mb-6 overflow-hidden rounded-lg border border-slate-700/40 bg-gradient-to-br from-slate-900/60 to-slate-800/40 backdrop-blur-sm transition-all hover:border-slate-600/50">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(148,163,184,0.08),transparent_50%)]" />
+      <div className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5" />
+      </div>
+      <div className="relative p-6 text-center">
+        <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-slate-800/50 text-2xl">
+          🎨
+        </div>
+        <h4 className="mb-2 text-base font-semibold text-slate-100">Visualize This Era</h4>
+        <p className="mb-5 text-xs leading-relaxed text-slate-400">
+          Generate an AI image showing what this location looked like millions of years ago
+        </p>
+        <button
+          onClick={onGenerate}
+          className="inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-blue-600 to-blue-700 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-blue-900/30 transition-all hover:from-blue-500 hover:to-blue-600 hover:shadow-xl hover:shadow-blue-900/40 active:scale-95"
+        >
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          Generate Image
+        </button>
+      </div>
     </div>
   );
 }
@@ -388,16 +419,22 @@ function GeneratedVideoDisplay({
   // Show error state with friendly message
   if (error) {
     return (
-      <div className="bg-red-900/20 rounded-xl p-6 mb-6 text-center border border-red-500/30">
-        <div className="text-4xl mb-3">🎬</div>
-        <p className="text-red-300 text-sm mb-2">Video generation didn't work this time</p>
-        <p className="text-gray-400 text-xs mb-4">{error}</p>
-        <button
-          onClick={onGenerate}
-          className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm"
-        >
-          Try Again
-        </button>
+      <div className="relative mb-6 overflow-hidden rounded-lg border border-red-900/40 bg-gradient-to-br from-red-950/40 to-red-900/20 backdrop-blur-sm">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(220,38,38,0.1),transparent_50%)]" />
+        <div className="relative p-5 text-center">
+          <div className="mb-3 text-3xl opacity-60">🎬</div>
+          <p className="mb-1 text-sm font-medium text-red-200">Video generation failed</p>
+          <p className="mb-4 text-xs leading-relaxed text-red-300/70">{error}</p>
+          <button
+            onClick={onGenerate}
+            className="inline-flex items-center gap-2 rounded-md bg-red-900/50 px-4 py-2 text-xs font-medium text-red-100 transition-all hover:bg-red-900/70 active:scale-95"
+          >
+            <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Try Again
+          </button>
+        </div>
       </div>
     );
   }
@@ -405,14 +442,23 @@ function GeneratedVideoDisplay({
   // Show video operation progress
   if (videoOperation && (videoOperation.status === 'pending' || videoOperation.status === 'processing')) {
     return (
-      <div className="bg-purple-900/20 rounded-xl p-8 mb-6 text-center border border-purple-500/20">
-        <LoadingSpinner size="md" />
-        <p className="text-gray-300 text-sm mt-3">
-          Creating your video... {videoOperation.progress}%
-        </p>
-        <p className="text-gray-500 text-xs mt-1">
-          Video generation takes 20-30 seconds. Hang tight!
-        </p>
+      <div className="relative mb-6 overflow-hidden rounded-lg border border-purple-700/40 bg-gradient-to-br from-purple-950/50 to-purple-900/30 backdrop-blur-sm">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(168,85,247,0.1),transparent_50%)]" />
+        <div className="relative p-8 text-center">
+          <LoadingSpinner size="md" />
+          <div className="mt-4">
+            <p className="text-sm font-medium text-purple-200">
+              Creating your video... {videoOperation.progress}%
+            </p>
+            <div className="mx-auto mt-3 h-1.5 w-48 overflow-hidden rounded-full bg-purple-950/50">
+              <div
+                className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500"
+                style={{ width: `${videoOperation.progress}%` }}
+              />
+            </div>
+            <p className="mt-2 text-xs text-purple-400">Takes 20-30 seconds</p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -420,9 +466,12 @@ function GeneratedVideoDisplay({
   // Show loading state
   if (isLoading) {
     return (
-      <div className="bg-purple-900/20 rounded-xl p-8 mb-6 text-center border border-purple-500/20">
-        <LoadingSpinner size="md" />
-        <p className="text-gray-300 text-sm mt-3">Starting video generation...</p>
+      <div className="relative mb-6 overflow-hidden rounded-lg border border-purple-700/40 bg-gradient-to-br from-purple-950/50 to-purple-900/30 backdrop-blur-sm">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(168,85,247,0.1),transparent_50%)]" />
+        <div className="relative p-8 text-center">
+          <LoadingSpinner size="md" />
+          <p className="mt-3 text-sm font-medium text-purple-200">Starting video generation...</p>
+        </div>
       </div>
     );
   }
@@ -430,21 +479,32 @@ function GeneratedVideoDisplay({
   // Show video if available
   if (videoUrl && video) {
     return (
-      <div className="mb-6 space-y-4">
-        <div className="rounded-xl overflow-hidden shadow-lg">
-          <video
-            ref={videoRef}
-            src={videoUrl}
-            controls
-            autoPlay
-            muted
-            playsInline
-            className="w-full h-auto"
-            onEnded={() => setHasEnded(true)}
-          />
-          <div className="bg-deep-800/80 px-3 py-2 text-xs text-gray-400">
-            AI-generated video • {video.duration}s • {video.modelUsed}
-            {video.extensionCount ? ` • ${video.extensionCount} extension(s)` : ''}
+      <div className="mb-6 space-y-3">
+        <div className="group relative overflow-hidden rounded-lg border border-slate-700/30 bg-black/20 shadow-2xl">
+          <div className="aspect-video overflow-hidden bg-black">
+            <video
+              ref={videoRef}
+              src={videoUrl}
+              controls
+              autoPlay
+              muted
+              playsInline
+              className="h-full w-full object-contain"
+              onEnded={() => setHasEnded(true)}
+            />
+          </div>
+          <div className="border-t border-slate-700/30 bg-gradient-to-r from-slate-900/90 to-slate-800/90 px-3 py-2 backdrop-blur-sm">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-medium text-slate-300">AI Video • {video.duration}s</span>
+              <div className="flex items-center gap-2 text-slate-500">
+                <span>{video.modelUsed}</span>
+                {video.extensionCount ? (
+                  <span className="rounded bg-purple-900/40 px-1.5 py-0.5 text-[10px] text-purple-300">
+                    +{video.extensionCount} ext
+                  </span>
+                ) : null}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -465,19 +525,31 @@ function GeneratedVideoDisplay({
 
   // Show generate button (default state)
   return (
-    <div className="bg-gradient-to-br from-purple-900/30 to-pink-900/30 rounded-xl p-6 mb-6 text-center border border-purple-500/20">
-      <div className="text-4xl mb-3">🎬</div>
-      <h4 className="text-white font-medium mb-2">Bring This Era to Life</h4>
-      <p className="text-gray-400 text-sm mb-4">
-        Generate a short AI video showing the prehistoric landscape in motion
-      </p>
-      <button
-        onClick={onGenerate}
-        className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl transition-all font-medium shadow-lg hover:shadow-xl"
-      >
-        🎥 Generate Video
-      </button>
-      <p className="text-gray-500 text-xs mt-3">Takes about 20-30 seconds</p>
+    <div className="group relative mb-6 overflow-hidden rounded-lg border border-purple-700/40 bg-gradient-to-br from-purple-950/50 to-purple-900/30 backdrop-blur-sm transition-all hover:border-purple-600/50">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(168,85,247,0.1),transparent_50%)]" />
+      <div className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5" />
+      </div>
+      <div className="relative p-6 text-center">
+        <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-purple-900/50 text-2xl">
+          🎬
+        </div>
+        <h4 className="mb-2 text-base font-semibold text-slate-100">Bring This Era to Life</h4>
+        <p className="mb-5 text-xs leading-relaxed text-slate-400">
+          Generate a short AI video showing the prehistoric landscape in motion
+        </p>
+        <button
+          onClick={onGenerate}
+          className="inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-purple-600 to-pink-600 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-purple-900/30 transition-all hover:from-purple-500 hover:to-pink-500 hover:shadow-xl hover:shadow-purple-900/40 active:scale-95"
+        >
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Generate Video
+        </button>
+        <p className="mt-3 text-xs text-slate-500">Takes 20-30 seconds</p>
+      </div>
     </div>
   );
 }

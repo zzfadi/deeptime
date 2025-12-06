@@ -8,3 +8,4 @@ export * from './orchestrator.generators';
 export * from './persistence.generators';
 export * from './costTracking.generators';
 export * from './explicitCache.generators';
+export * from './dashboard.generators';

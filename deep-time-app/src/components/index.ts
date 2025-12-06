@@ -9,8 +9,8 @@
 export { LocationHeader } from './LocationHeader';
 export type { LocationHeaderProps } from './LocationHeader';
 
-export { TimeSlider, formatYearsAgo, mapTimeToEra } from './TimeSlider';
-export type { TimeSliderProps, EraBoundary } from './TimeSlider';
+export { TimeSlider, formatYearsAgo, mapTimeToEra, getEraColor } from './TimeSlider';
+export type { TimeSliderProps, EraBoundary, TransitionState } from './TimeSlider';
 
 export { EraCard, getEraBackground, getEraIcon } from './EraCard';
 export type { EraCardProps } from './EraCard';
@@ -51,3 +51,7 @@ export type { default as ApiKeyModalProps } from './ApiKeyModal';
 
 export { VideoExtensionUI } from './VideoExtensionUI';
 export type { VideoExtensionUIProps } from './VideoExtensionUI';
+
+// AI Dashboard for usage metrics - Requirements: 1.1, 1.2, 1.3
+export { AIDashboard, calculateCacheHitRate, transformToDashboardMetrics } from './AIDashboard';
+export type { AIDashboardProps } from './AIDashboard';
