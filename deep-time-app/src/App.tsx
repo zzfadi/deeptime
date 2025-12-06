@@ -9,7 +9,7 @@
 import { useEffect, useState, useCallback, lazy, Suspense } from 'react';
 import { useAppStore } from './store/appStore';
 import { Home } from './pages';
-import { FullPageSpinner, InstallBanner, ApiKeyModal, hasApiKey } from './components';
+import { FullPageSpinner, InstallBanner, hasApiKey, ControlPanel, FloatingControlButton } from './components';
 import { useWebXRSupport, useCacheInitialization } from './hooks';
 import { arFallbackDetector } from './ar/ARFallbackDetector';
 
@@ -21,20 +21,17 @@ const EraDetail = lazy(() => import('./pages/EraDetail'));
 const ARView = lazy(() => import('./components/ARView'));
 const IOSARView = lazy(() => import('./components/IOSARView'));
 
-// Lazy load AIDashboard for code splitting
-// Requirement 2.2: Navigate to dashboard view when button clicked
-const AIDashboard = lazy(() => import('./components/AIDashboard'));
+// AIDashboard is now integrated into ControlPanel component
 
 // Import iOS detection
 import { isIOS } from './utils/iosARDetection';
 
-type Page = 'home' | 'era-detail' | 'ar' | 'dashboard';
+type Page = 'home' | 'era-detail' | 'ar';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [arChecked, setArChecked] = useState(false);
-  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
-  const [apiKeyConfigured, setApiKeyConfigured] = useState(hasApiKey());
+  const [showControlPanel, setShowControlPanel] = useState(false);
   const { setOfflineStatus, setViewMode, currentEra, narrative, isNarrativeLoading, location } = useAppStore();
   const webXRSupport = useWebXRSupport();
   
@@ -59,11 +56,11 @@ function App() {
     }
   }, [cacheStats, cacheInitialized]);
 
-  // Show API key prompt on first load if no key configured
+  // Show control panel prompt on first load if no key configured
   useEffect(() => {
     if (!hasApiKey()) {
-      // Delay showing modal to let the app load first
-      const timer = setTimeout(() => setShowApiKeyModal(true), 1500);
+      // Delay showing panel to let the app load first
+      const timer = setTimeout(() => setShowControlPanel(true), 1500);
       return () => clearTimeout(timer);
     }
   }, []);
@@ -147,17 +144,8 @@ function App() {
     arFallbackDetector.setCardViewFallback();
   }, [setViewMode]);
 
-  // Handle navigating to dashboard
-  // Requirement 2.2: Navigate to dashboard view when button clicked
-  const handleDashboardClick = useCallback(() => {
-    setCurrentPage('dashboard');
-  }, []);
-
-  // Handle navigating back from dashboard
-  // Requirement 2.3: Back button to return to main app
-  const handleDashboardBack = useCallback(() => {
-    setCurrentPage('home');
-  }, []);
+  // Dashboard is now integrated into the ControlPanel component
+  // No separate navigation needed - it's a slide-up panel on home
 
   // Render current page with Suspense for lazy-loaded components
   switch (currentPage) {
@@ -212,19 +200,6 @@ function App() {
         </Suspense>
       );
     
-    case 'dashboard':
-      // AI Dashboard view
-      // Requirement 2.2: Navigate to dashboard view when button clicked
-      return (
-        <Suspense fallback={
-          <div className="min-h-screen bg-deep-900 flex items-center justify-center">
-            <FullPageSpinner label="Loading dashboard..." />
-          </div>
-        }>
-          <AIDashboard onBack={handleDashboardBack} />
-        </Suspense>
-      );
-
     case 'home':
     default:
       return (
@@ -232,29 +207,16 @@ function App() {
           <Home onViewEraDetail={handleViewEraDetail} />
           <InstallBanner />
           
-          {/* Dashboard button - Requirement 2.1: Display dashboard access button */}
-          <button
-            onClick={handleDashboardClick}
-            className="fixed bottom-4 right-20 z-40 w-12 h-12 bg-slate-800/90 hover:bg-slate-700 rounded-full flex items-center justify-center shadow-lg border border-slate-700 transition-colors"
-            title="AI Dashboard"
-          >
-            <span className="text-xl">📊</span>
-          </button>
+          {/* Unified Control Button - combines dashboard + settings */}
+          <FloatingControlButton 
+            onClick={() => setShowControlPanel(true)}
+            isPanelOpen={showControlPanel}
+          />
           
-          {/* Settings button - always visible */}
-          <button
-            onClick={() => setShowApiKeyModal(true)}
-            className="fixed bottom-4 right-4 z-40 w-12 h-12 bg-slate-800/90 hover:bg-slate-700 rounded-full flex items-center justify-center shadow-lg border border-slate-700 transition-colors"
-            title="Settings"
-          >
-            <span className="text-xl">{apiKeyConfigured ? '⚙️' : '🔑'}</span>
-          </button>
-          
-          {/* API Key Modal */}
-          <ApiKeyModal
-            isOpen={showApiKeyModal}
-            onClose={() => setShowApiKeyModal(false)}
-            onSave={(key) => setApiKeyConfigured(!!key)}
+          {/* Unified Control Panel - Requirements 2.1, 2.2: Dashboard + Settings */}
+          <ControlPanel
+            isOpen={showControlPanel}
+            onClose={() => setShowControlPanel(false)}
           />
         </>
       );

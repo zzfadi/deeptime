@@ -55,3 +55,10 @@ export type { VideoExtensionUIProps } from './VideoExtensionUI';
 // AI Dashboard for usage metrics - Requirements: 1.1, 1.2, 1.3
 export { AIDashboard, calculateCacheHitRate, transformToDashboardMetrics } from './AIDashboard';
 export type { AIDashboardProps } from './AIDashboard';
+
+// Unified Control Panel (Dashboard + Settings) - Mobile-first design
+export { ControlPanel } from './ControlPanel';
+export type { ControlPanelProps } from './ControlPanel';
+
+export { FloatingControlButton } from './FloatingControlButton';
+export type { FloatingControlButtonProps } from './FloatingControlButton';
