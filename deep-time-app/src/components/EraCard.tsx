@@ -161,8 +161,8 @@ export function EraCard({
   onARClick,
   webXRSupported = false,
 }: EraCardProps) {
-  // Show skeleton while loading
-  if (isLoading || !era) {
+  // Only show full skeleton if we have no era data at all
+  if (!era) {
     return <EraCardSkeleton />;
   }
 
@@ -191,8 +191,26 @@ export function EraCard({
         )}
       </div>
 
-      {/* Narrative description */}
-      {narrative ? (
+      {/* Narrative description - show loading only for this section */}
+      {isLoading && !narrative ? (
+        <div className="animate-pulse">
+          <div className="space-y-2 mb-4">
+            <div className="h-4 w-full skeleton" />
+            <div className="h-4 w-5/6 skeleton" />
+            <div className="h-4 w-4/6 skeleton" />
+          </div>
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <div className="h-4 w-16 skeleton mb-2" />
+              <div className="h-3 w-full skeleton" />
+            </div>
+            <div className="flex-1">
+              <div className="h-4 w-16 skeleton mb-2" />
+              <div className="h-3 w-full skeleton" />
+            </div>
+          </div>
+        </div>
+      ) : narrative ? (
         <>
           <p className="text-gray-200 leading-relaxed mb-4">
             {narrative.shortDescription}

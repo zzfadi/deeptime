@@ -39,12 +39,15 @@ export { AROverlay } from './AROverlay';
 export type { AROverlayProps } from './AROverlay';
 
 // API Key Modal for runtime Gemini key configuration
-export { 
-  ApiKeyModal, 
-  getStoredApiKey, 
-  storeApiKey, 
-  clearApiKey, 
-  hasApiKey, 
-  getActiveApiKey 
+export {
+  ApiKeyModal,
+  getStoredApiKey,
+  storeApiKey,
+  clearApiKey,
+  hasApiKey,
+  getActiveApiKey
 } from './ApiKeyModal';
 export type { default as ApiKeyModalProps } from './ApiKeyModal';
+
+export { VideoExtensionUI } from './VideoExtensionUI';
+export type { VideoExtensionUIProps } from './VideoExtensionUI';

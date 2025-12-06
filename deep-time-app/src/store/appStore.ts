@@ -11,12 +11,24 @@ import { geologicalDataService, GeologicalError } from '../services/geological';
 import { narrativeService, NarrativeError } from '../services/narrative';
 import { firebaseService } from '../services/firebase';
 import { cacheService } from '../services/cache';
+import type { EraContent, VideoOperation } from '../services/ai/types';
 
 // ============================================
 // Types
 // ============================================
 
 export type ViewMode = 'card' | 'ar';
+
+/**
+ * AI content cache entry for an era
+ * Stores generated content to persist across era switches
+ */
+export interface EraAIContentEntry {
+  content: EraContent;
+  videoOperation?: VideoOperation;
+  fromCache: boolean;
+  loadedAt: number; // timestamp
+}
 
 export interface AppState {
   // Location state
@@ -37,6 +49,12 @@ export interface AppState {
   narrative: Narrative | null;
   isNarrativeLoading: boolean;
   narrativeError: string | null;
+  // Narrative cache - keyed by layer ID to persist across era switches
+  narrativeCache: Map<string, Narrative>;
+
+  // AI content state - keyed by era ID to persist across era switches
+  eraAIContent: Map<string, EraAIContentEntry>;
+  eraAIContentLoading: Set<string>; // era IDs currently loading
 
   // UI state
   isOffline: boolean;
@@ -66,6 +84,13 @@ export interface AppActions {
 
   // Narrative actions
   loadNarrative: (layer: GeologicalLayer) => Promise<void>;
+
+  // AI content actions - persist content across era switches
+  setEraAIContent: (eraId: string, entry: EraAIContentEntry) => void;
+  getEraAIContent: (eraId: string) => EraAIContentEntry | undefined;
+  setEraAIContentLoading: (eraId: string, loading: boolean) => void;
+  isEraAIContentLoading: (eraId: string) => boolean;
+  clearEraAIContent: () => void; // Clear all when location changes
 
   // UI actions
   setViewMode: (mode: ViewMode) => void;
@@ -165,6 +190,11 @@ export const useAppStore = create<AppStore>((set, get) => ({
   narrative: null,
   isNarrativeLoading: false,
   narrativeError: null,
+  narrativeCache: new Map<string, Narrative>(),
+
+  // AI content state - persists across era switches
+  eraAIContent: new Map<string, EraAIContentEntry>(),
+  eraAIContentLoading: new Set<string>(),
 
   isOffline: !navigator.onLine,
   viewMode: 'card',
@@ -296,6 +326,17 @@ export const useAppStore = create<AppStore>((set, get) => ({
   // ============================================
 
   loadNarrative: async (layer: GeologicalLayer) => {
+    // Check cache first - if we have a cached narrative, use it immediately
+    const cachedNarrative = get().narrativeCache.get(layer.id);
+    if (cachedNarrative) {
+      set({
+        narrative: cachedNarrative,
+        isNarrativeLoading: false,
+        narrativeError: null,
+      });
+      return;
+    }
+
     set({
       isNarrativeLoading: true,
       narrativeError: null,
@@ -303,9 +344,16 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
     try {
       const narrative = await narrativeService.generateNarrative(layer);
-      set({
-        narrative,
-        isNarrativeLoading: false,
+      
+      // Cache the narrative for future use
+      set((state) => {
+        const newCache = new Map(state.narrativeCache);
+        newCache.set(layer.id, narrative);
+        return {
+          narrative,
+          isNarrativeLoading: false,
+          narrativeCache: newCache,
+        };
       });
     } catch (err) {
       const errorMessage =
@@ -313,14 +361,59 @@ export const useAppStore = create<AppStore>((set, get) => ({
           ? err.message
           : 'Failed to generate narrative.';
 
-      // Use fallback narrative
+      // Use fallback narrative and cache it
       const fallbackNarrative = narrativeService.getFallback(layer);
-      set({
-        narrative: fallbackNarrative,
-        isNarrativeLoading: false,
-        narrativeError: errorMessage,
+      set((state) => {
+        const newCache = new Map(state.narrativeCache);
+        newCache.set(layer.id, fallbackNarrative);
+        return {
+          narrative: fallbackNarrative,
+          isNarrativeLoading: false,
+          narrativeError: errorMessage,
+          narrativeCache: newCache,
+        };
       });
     }
+  },
+
+  // ============================================
+  // AI Content Actions - Persist across era switches
+  // ============================================
+
+  setEraAIContent: (eraId: string, entry: EraAIContentEntry) => {
+    set((state) => {
+      const newMap = new Map(state.eraAIContent);
+      newMap.set(eraId, entry);
+      return { eraAIContent: newMap };
+    });
+  },
+
+  getEraAIContent: (eraId: string) => {
+    return get().eraAIContent.get(eraId);
+  },
+
+  setEraAIContentLoading: (eraId: string, loading: boolean) => {
+    set((state) => {
+      const newSet = new Set(state.eraAIContentLoading);
+      if (loading) {
+        newSet.add(eraId);
+      } else {
+        newSet.delete(eraId);
+      }
+      return { eraAIContentLoading: newSet };
+    });
+  },
+
+  isEraAIContentLoading: (eraId: string) => {
+    return get().eraAIContentLoading.has(eraId);
+  },
+
+  clearEraAIContent: () => {
+    set({
+      eraAIContent: new Map<string, EraAIContentEntry>(),
+      narrativeCache: new Map<string, Narrative>(),
+      eraAIContentLoading: new Set<string>(),
+    });
   },
 
   // ============================================
@@ -441,6 +534,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
   // ============================================
 
   initializeForLocation: async (location: GeoCoordinate) => {
+    // Clear AI content when location changes - new location means new content
+    get().clearEraAIContent();
+    
     set({
       location,
       isGeologyLoading: true,

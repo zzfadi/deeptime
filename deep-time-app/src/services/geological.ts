@@ -89,7 +89,7 @@ function openDatabase(): Promise<IDBDatabase> {
 // USGS API Integration
 // ============================================
 
-const USGS_API_BASE = 'https://mrdata.usgs.gov/geology/state/json';
+const USGS_API_BASE = '/api/usgs/geology/state/json';
 
 /**
  * Transforms USGS API response to our internal layer format
@@ -102,7 +102,7 @@ function transformUSGSResponse(usgsData: unknown, _location: GeoCoordinate): unk
   }
 
   const data = usgsData as Record<string, unknown>;
-  
+
   // USGS returns features array in GeoJSON format
   const features = data.features as unknown[] | undefined;
   if (!Array.isArray(features) || features.length === 0) {
@@ -169,7 +169,7 @@ function transformUSGSUnits(units: unknown[]): unknown[] {
  */
 function mapRockTypeToMaterial(rockType: string | undefined): string {
   if (!rockType) return 'soil';
-  
+
   const type = rockType.toLowerCase();
   if (type.includes('granite')) return 'granite';
   if (type.includes('basalt')) return 'basalt';
@@ -187,9 +187,9 @@ function mapRockTypeToMaterial(rockType: string | undefined): string {
  */
 function estimateYearsAgo(ageString: string | undefined): number {
   if (!ageString) return 0;
-  
+
   const age = ageString.toLowerCase();
-  
+
   // Geological time periods (approximate midpoints in years)
   if (age.includes('quaternary') || age.includes('holocene')) return 10000;
   if (age.includes('pleistocene')) return 1000000;
@@ -209,7 +209,7 @@ function estimateYearsAgo(ageString: string | undefined): number {
   if (age.includes('cambrian')) return 520000000;
   if (age.includes('precambrian') || age.includes('proterozoic')) return 1500000000;
   if (age.includes('archean')) return 3000000000;
-  
+
   return 0;
 }
 
@@ -232,7 +232,7 @@ export const geologicalDataService: GeologicalDataService = {
     try {
       // Query USGS API
       const url = `${USGS_API_BASE}?latitude=${location.latitude}&longitude=${location.longitude}&format=json`;
-      
+
       const response = await fetch(url, {
         headers: {
           'Accept': 'application/json',
@@ -245,10 +245,10 @@ export const geologicalDataService: GeologicalDataService = {
       }
 
       const usgsData = await response.json();
-      
+
       // Transform USGS response to our format
       const rawLayers = transformUSGSResponse(usgsData, location);
-      
+
       if (rawLayers.length === 0) {
         // No data from USGS, use fallback
         return generateFallbackStack(location);
@@ -257,7 +257,7 @@ export const geologicalDataService: GeologicalDataService = {
       // Parse using core library
       // Requirement 1.3: Construct GeologicalLayer stack
       const parseResult = parseGeologicalResponse(rawLayers);
-      
+
       if (parseResult.errors.length > 0 || parseResult.layers.length === 0) {
         // Parse failed, use fallback
         return generateFallbackStack(location);
@@ -283,13 +283,13 @@ export const geologicalDataService: GeologicalDataService = {
       if (error instanceof GeologicalError) {
         throw error;
       }
-      
+
       // Network error - try to return cached data or fallback
       const cached = await this.getCached(location);
       if (cached) {
         return cached;
       }
-      
+
       // Generate fallback for demo
       return generateFallbackStack(location);
     }
@@ -302,7 +302,7 @@ export const geologicalDataService: GeologicalDataService = {
     try {
       const db = await openDatabase();
       const key = generateCacheKey(location);
-      
+
       return new Promise((resolve) => {
         const transaction = db.transaction(STORE_NAME, 'readonly');
         const store = transaction.objectStore(STORE_NAME);
@@ -340,7 +340,7 @@ export const geologicalDataService: GeologicalDataService = {
     try {
       const db = await openDatabase();
       const key = generateCacheKey(location);
-      
+
       const cachedData: CachedGeologicalData = {
         key,
         location,
@@ -378,7 +378,7 @@ export const geologicalDataService: GeologicalDataService = {
   async clearCache(): Promise<void> {
     try {
       const db = await openDatabase();
-      
+
       return new Promise((resolve) => {
         const transaction = db.transaction(STORE_NAME, 'readwrite');
         const store = transaction.objectStore(STORE_NAME);

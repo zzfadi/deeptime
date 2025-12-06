@@ -1,7 +1,18 @@
 /**
- * Narrative Service with Gemini AI Integration
+ * @deprecated This module is deprecated. Use textGenerator from './ai/textGenerator' for narrative generation.
+ * The contentOrchestrator in './ai/contentOrchestrator' is the recommended entry point for all AI content.
+ * 
+ * This legacy service uses the Google AI SDK directly, while the new implementation uses REST API
+ * for better control over caching and cost tracking.
+ * 
+ * Narrative Service with Gemini AI Integration (LEGACY)
  * Generates engaging narratives for geological layers and creatures using AI
  * Requirements: 2.1, 2.2, 2.4, 4.1, 4.2
+ * 
+ * Migration Guide:
+ * - For era narratives: Use contentOrchestrator.getContent() or textGenerator.generateNarrative()
+ * - For creature narrations: creatureNarrationService is still available here for AR features
+ * - For fallback narratives: Use textGenerator.getFallbackNarrative()
  */
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
@@ -217,8 +228,13 @@ function createGeminiClient(): GoogleGenerativeAI | null {
   return new GoogleGenerativeAI(apiKey);
 }
 
+/**
+ * @deprecated Use textGenerator from './ai/textGenerator' or contentOrchestrator from './ai/contentOrchestrator' instead.
+ * This service is maintained for backward compatibility only.
+ */
 export const narrativeService: NarrativeService = {
   /**
+   * @deprecated Use textGenerator.generateNarrative() or contentOrchestrator.getContent() instead.
    * Generates a narrative for a geological layer using Gemini AI
    * Requirement 2.1: Send layer metadata to Gemini API
    * Requirement 2.2: Display era-appropriate description with flora, fauna, and climate
@@ -269,6 +285,7 @@ export const narrativeService: NarrativeService = {
   },
 
   /**
+   * @deprecated Use textGenerator.getFallbackNarrative() instead.
    * Gets a fallback narrative for a geological layer
    * Requirement 2.4: Display cached fallback content when narrative generation fails
    */

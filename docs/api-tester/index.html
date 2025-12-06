@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Time AI API Tester</title>
+    <meta name="description"
+        content="Test and troubleshoot Gemini and Veo API calls - 1:1 match with Deep Time App flow">
+    <style>
+        :root {
+            --bg-dark: #0f0f1a;
+            --bg-card: #1a1a2e;
+            --bg-input: #252540;
+            --accent-primary: #7c3aed;
+            --accent-secondary: #06b6d4;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-error: #ef4444;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-color: #334155;
+            --gradient-primary: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 2rem 0 3rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* API Key Section */
+        .api-key-section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .api-key-section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .api-key-section h2::before {
+            content: '🔑';
+        }
+
+        .input-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        input[type="password"],
+        input[type="text"],
+        textarea,
+        select {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        button.secondary {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            color: var(--text-primary);
+            background: var(--bg-input);
+            transform: none;
+            box-shadow: none;
+        }
+
+        .tab.active {
+            color: var(--accent-primary);
+            background: var(--bg-card);
+            border-bottom: 2px solid var(--accent-primary);
+        }
+
+        /* Test Panels */
+        .test-panel {
+            display: none;
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .test-panel.active {
+            display: block;
+        }
+
+        .test-panel h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .test-panel .description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            resize: vertical;
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.9rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        /* Code Block */
+        .code-block {
+            background: #0d0d14;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.85rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .code-block pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* Results Section */
+        .results-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .results-section h4 {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .result-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .result-status.success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-success);
+        }
+
+        .result-status.error {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--accent-error);
+        }
+
+        .result-status.pending {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--accent-warning);
+        }
+
+        /* Media Preview */
+        .media-preview {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .media-preview img,
+        .media-preview video {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-input);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-bar .fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        /* Cost Estimate */
+        .cost-estimate {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid var(--accent-secondary);
+            border-radius: 8px;
+            color: var(--accent-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Troubleshooting Section */
+        .troubleshooting {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .troubleshooting h3 {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .troubleshooting h3::before {
+            content: '🔧';
+        }
+
+        .error-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .error-table th,
+        .error-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .error-table th {
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .error-code {
+            font-family: monospace;
+            background: var(--bg-input);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--text-muted);
+            border-radius: 50%;
+            border-top-color: var(--accent-primary);
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Logs */
+        .logs {
+            background: #0d0d14;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.85rem;
+        }
+
+        .log-entry {
+            padding: 0.25rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .log-entry.info {
+            color: var(--text-secondary);
+        }
+
+        .log-entry.success {
+            color: var(--accent-success);
+        }
+
+        .log-entry.error {
+            color: var(--accent-error);
+        }
+
+        .log-entry.warning {
+            color: var(--accent-warning);
+        }
+
+        .log-timestamp {
+            color: var(--text-muted);
+            margin-right: 0.5rem;
+        }
+
+        /* Model Info */
+        .model-info {
+            background: rgba(124, 58, 237, 0.1);
+            border: 1px solid var(--accent-primary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .model-info h4 {
+            color: var(--accent-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .model-info p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🦖 Deep Time AI API Tester</h1>
+            <p class="subtitle">Test Gemini & Veo APIs — 1:1 match with app flow</p>
+        </header>
+
+        <!-- API Key Section -->
+        <section class="api-key-section">
+            <h2>API Configuration</h2>
+            <div class="input-group">
+                <input type="password" id="apiKey" placeholder="Enter your Gemini API Key (AIza...)" />
+                <button onclick="toggleApiKey()" class="secondary" id="toggleKeyBtn">Show</button>
+                <button onclick="validateApiKey()">Validate Key</button>
+            </div>
+            <div id="keyValidationResult" style="margin-top: 1rem;"></div>
+        </section>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('image')">🖼️ Image Generation</button>
+            <button class="tab" onclick="showTab('video')">🎬 Video Generation</button>
+            <button class="tab" onclick="showTab('text')">📝 Text Generation</button>
+            <button class="tab" onclick="showTab('troubleshoot')">🔧 Troubleshooting</button>
+        </div>
+
+        <!-- Image Generation Panel -->
+        <div id="image-panel" class="test-panel active">
+            <h3>🖼️ Image Generation Test</h3>
+            <p class="description">Test Gemini 2.5 Flash Image API — Same as <code>imageGenerator.ts</code></p>
+
+            <div class="model-info">
+                <h4>Model: gemini-2.5-flash-image</h4>
+                <p>Native image generation with contextual understanding. Pricing: $0.039 per image</p>
+            </div>
+
+            <div class="form-group">
+                <label>Image Prompt (same format as app)</label>
+                <textarea id="imagePrompt" placeholder="Generate a photorealistic landscape image showing...">Generate a photorealistic landscape image showing: A prehistoric scene at Test Location during the Jurassic period, 150 million years ago. The landscape features lush forests with towering conifers and ferns. Dinosaurs roam the terrain. Climate: warm and humid.
+
+Style: Photorealistic nature photography, cinematic lighting, high detail.
+Aspect ratio: 16:9 (landscape orientation).
+Do not include any text, labels, or watermarks in the image.</textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Aspect Ratio</label>
+                    <select id="imageAspectRatio">
+                        <option value="16:9">16:9 (Landscape)</option>
+                        <option value="9:16">9:16 (Portrait)</option>
+                        <option value="1:1">1:1 (Square)</option>
+                        <option value="4:3">4:3</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="cost-estimate">
+                💰 Estimated Cost: $0.039 per image
+            </div>
+
+            <button onclick="testImageGeneration()" id="imageTestBtn">
+                🚀 Generate Image (REAL API CALL)
+            </button>
+
+            <div class="results-section" id="imageResults">
+                <h4>Request Details</h4>
+                <div class="code-block" id="imageRequest">
+                    <pre>// Request will appear here...</pre>
+                </div>
+
+                <h4>Response <span class="result-status" id="imageStatus"></span></h4>
+                <div class="code-block" id="imageResponse">
+                    <pre>// Response will appear here...</pre>
+                </div>
+
+                <div class="media-preview" id="imagePreview"></div>
+
+                <h4>Logs</h4>
+                <div class="logs" id="imageLogs"></div>
+            </div>
+        </div>
+
+        <!-- Video Generation Panel -->
+        <div id="video-panel" class="test-panel">
+            <h3>🎬 Video Generation Test</h3>
+            <p class="description">Test Veo 3.1 Fast API — Same as <code>videoGenerator.ts</code></p>
+
+            <div class="model-info">
+                <h4>Model: veo-3.1-fast-generate-preview</h4>
+                <p>Fast video generation with audio. Pricing: $0.15 per second of video</p>
+            </div>
+
+            <div class="form-group">
+                <label>Video Prompt (same format as app)</label>
+                <textarea id="videoPrompt" placeholder="A prehistoric scene...">A cinematic video of prehistoric Earth at Test Location during the Jurassic period. 
+
+The scene begins with a sweeping view of the ancient landscape featuring lush vegetation with cycads, ferns, and tall conifers. A Brachiosaurus slowly walks through the scene, its long neck reaching for tree tops. Pterosaurs fly overhead. 
+
+Natural movement, documentary style cinematography, golden hour lighting, slight camera movement.
+
+Location: California, USA
+Time Period: 150 million years ago</textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Duration (seconds)</label>
+                    <select id="videoDuration">
+                        <option value="4">4 seconds ($0.60)</option>
+                        <option value="5">5 seconds ($0.75)</option>
+                        <option value="6" selected>6 seconds ($0.90)</option>
+                        <option value="8">8 seconds ($1.20)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Aspect Ratio</label>
+                    <select id="videoAspectRatio">
+                        <option value="9:16" selected>9:16 (Portrait - App Default)</option>
+                        <option value="16:9">16:9 (Landscape)</option>
+                        <option value="1:1">1:1 (Square)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Resolution</label>
+                    <select id="videoResolution">
+                        <option value="720p" selected>720p</option>
+                        <option value="1080p">1080p</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="cost-estimate" id="videoCostEstimate">
+                💰 Estimated Cost: $0.90 (6 seconds × $0.15/sec)
+            </div>
+
+            <button onclick="testVideoGeneration()" id="videoTestBtn">
+                🚀 Generate Video (REAL API CALL)
+            </button>
+
+            <div class="results-section" id="videoResults">
+                <h4>Step 1: Start Generation Request</h4>
+                <div class="code-block" id="videoRequest">
+                    <pre>// Request will appear here...</pre>
+                </div>
+
+                <h4>Step 2: Operation Status</h4>
+                <div id="videoOperationInfo">
+                    <div class="progress-bar hidden" id="videoProgress">
+                        <div class="fill" style="width: 0%"></div>
+                    </div>
+                    <p id="videoOperationStatus">Not started</p>
+                </div>
+
+                <h4>Step 3: Response <span class="result-status" id="videoStatus"></span></h4>
+                <div class="code-block" id="videoResponse">
+                    <pre>// Response will appear here...</pre>
+                </div>
+
+                <div class="media-preview" id="videoPreview"></div>
+
+                <h4>Logs</h4>
+                <div class="logs" id="videoLogs"></div>
+            </div>
+        </div>
+
+        <!-- Text Generation Panel -->
+        <div id="text-panel" class="test-panel">
+            <h3>📝 Text Generation Test</h3>
+            <p class="description">Test Gemini 2.5 Flash for narrative generation — Same as
+                <code>textGenerator.ts</code>
+            </p>
+
+            <div class="model-info">
+                <h4>Model: gemini-2.5-flash</h4>
+                <p>Balanced performance for detailed content. Pricing: $0.30/1M input, $2.50/1M output</p>
+            </div>
+
+            <div class="form-group">
+                <label>System Prompt</label>
+                <textarea id="textSystemPrompt"
+                    style="min-height: 80px;">You are an expert paleontologist and science communicator. Generate engaging narratives about prehistoric Earth for a mobile AR application called "Deep Time". Be accurate, vivid, and educational.</textarea>
+            </div>
+
+            <div class="form-group">
+                <label>User Prompt (narrative request)</label>
+                <textarea
+                    id="textPrompt">Generate a detailed narrative about this location during the Jurassic period (150 million years ago).
+
+Location: San Francisco, California, USA
+Coordinates: 37.7749, -122.4194
+
+Include:
+- Flora: dominant plant species in this area
+- Fauna: creatures that would have lived here
+- Climate: temperature, humidity, atmosphere
+- Geological features: what the land looked like
+
+Format as a JSON object with: flora (array), fauna (array), climate (object with temperature, humidity, atmosphere), geologicalFeatures (array), and a narrative summary.</textarea>
+            </div>
+
+            <div class="cost-estimate">
+                💰 Estimated Cost: ~$0.001 per request (varies by token count)
+            </div>
+
+            <button onclick="testTextGeneration()" id="textTestBtn">
+                🚀 Generate Text (REAL API CALL)
+            </button>
+
+            <div class="results-section" id="textResults">
+                <h4>Request Details</h4>
+                <div class="code-block" id="textRequest">
+                    <pre>// Request will appear here...</pre>
+                </div>
+
+                <h4>Response <span class="result-status" id="textStatus"></span></h4>
+                <div class="code-block" id="textResponse">
+                    <pre>// Response will appear here...</pre>
+                </div>
+
+                <h4>Token Usage</h4>
+                <div id="tokenUsage" style="color: var(--text-secondary);"></div>
+
+                <h4>Logs</h4>
+                <div class="logs" id="textLogs"></div>
+            </div>
+        </div>
+
+        <!-- Troubleshooting Panel -->
+        <div id="troubleshoot-panel" class="test-panel">
+            <h3>🔧 Troubleshooting Guide</h3>
+            <p class="description">Common API errors and solutions (from Gemini API documentation)</p>
+
+            <table class="error-table">
+                <thead>
+                    <tr>
+                        <th>HTTP Code</th>
+                        <th>Status</th>
+                        <th>Description</th>
+                        <th>Solution</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="error-code">400</span></td>
+                        <td>INVALID_ARGUMENT</td>
+                        <td>Request body is malformed</td>
+                        <td>Check API reference for request format. Verify all required fields are present.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="error-code">400</span></td>
+                        <td>FAILED_PRECONDITION</td>
+                        <td>Free tier not available in your country</td>
+                        <td>Enable billing in Google AI Studio</td>
+                    </tr>
+                    <tr>
+                        <td><span class="error-code">403</span></td>
+                        <td>PERMISSION_DENIED</td>
+                        <td>API key doesn't have required permissions</td>
+                        <td>Check API key is correct and has proper access</td>
+                    </tr>
+                    <tr>
+                        <td><span class="error-code">404</span></td>
+                        <td>NOT_FOUND</td>
+                        <td>Resource not found</td>
+                        <td>Verify model name and API version are correct</td>
+                    </tr>
+                    <tr>
+                        <td><span class="error-code">429</span></td>
+                        <td>RESOURCE_EXHAUSTED</td>
+                        <td>Rate limit exceeded</td>
+                        <td>Check rate limits. Request quota increase if needed. Wait and retry.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="error-code">500</span></td>
+                        <td>INTERNAL</td>
+                        <td>Unexpected error on Google's side</td>
+                        <td>Reduce input context or switch models temporarily. Wait and retry.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="error-code">503</span></td>
+                        <td>UNAVAILABLE</td>
+                        <td>Service temporarily overloaded</td>
+                        <td>Switch models temporarily or wait and retry.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="error-code">504</span></td>
+                        <td>DEADLINE_EXCEEDED</td>
+                        <td>Processing timeout</td>
+                        <td>Reduce prompt size or set a larger timeout.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 style="margin-top: 2rem;">Rate Limits (Free Tier)</h3>
+            <table class="error-table">
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>RPM (Requests/Min)</th>
+                        <th>RPD (Requests/Day)</th>
+                        <th>TPM (Tokens/Min)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>gemini-2.5-flash</td>
+                        <td>15</td>
+                        <td>1,500</td>
+                        <td>1,000,000</td>
+                    </tr>
+                    <tr>
+                        <td>gemini-2.5-flash-image</td>
+                        <td>10</td>
+                        <td>1,500</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td>veo-3.1-fast</td>
+                        <td>2</td>
+                        <td>10</td>
+                        <td>N/A</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 style="margin-top: 2rem;">Quick Diagnostics</h3>
+            <button onclick="runDiagnostics()" style="margin-top: 1rem;">🔍 Run API Diagnostics</button>
+            <div class="logs" id="diagnosticsLogs" style="margin-top: 1rem;"></div>
+        </div>
+
+        <!-- Troubleshooting Footer -->
+        <section class="troubleshooting">
+            <h3>Need More Help?</h3>
+            <p style="color: var(--text-secondary);">
+                Check the full troubleshooting guide at <a href="https://ai.google.dev/gemini-api/docs/troubleshooting"
+                    target="_blank"
+                    style="color: var(--accent-secondary);">ai.google.dev/gemini-api/docs/troubleshooting</a>
+                or join the <a href="https://discuss.ai.google.dev" target="_blank"
+                    style="color: var(--accent-secondary);">Google AI developer forum</a>.
+            </p>
+        </section>
+    </div>
+
+    <script>
+        // ============================================
+        // CONSTANTS - Same as app
+        // ============================================
+        const GEMINI_API_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
+
+        const MODELS = {
+            IMAGE: 'gemini-2.5-flash-image',  // Image generation model
+            VIDEO: 'veo-3.1-fast-generate-preview',   // Video generation model
+            TEXT: 'gemini-2.5-flash'                   // Text generation model
+        };
+
+        const POLL_INTERVAL_MS = 10000; // 10 seconds, same as app
+        const MAX_POLL_ATTEMPTS = 30;   // Same as app
+
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+        function getApiKey() {
+            return document.getElementById('apiKey').value.trim();
+        }
+
+        function toggleApiKey() {
+            const input = document.getElementById('apiKey');
+            const btn = document.getElementById('toggleKeyBtn');
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.textContent = 'Hide';
+            } else {
+                input.type = 'password';
+                btn.textContent = 'Show';
+            }
+        }
+
+        function getTimestamp() {
+            return new Date().toLocaleTimeString();
+        }
+
+        function addLog(logsId, message, type = 'info') {
+            const logs = document.getElementById(logsId);
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.innerHTML = `<span class="log-timestamp">[${getTimestamp()}]</span>${message}`;
+            logs.appendChild(entry);
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        function clearLogs(logsId) {
+            document.getElementById(logsId).innerHTML = '';
+        }
+
+        function showTab(tabName) {
+            // Hide all panels
+            document.querySelectorAll('.test-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            // Remove active from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            // Show selected panel
+            document.getElementById(`${tabName}-panel`).classList.add('active');
+            // Set active tab
+            event.target.classList.add('active');
+        }
+
+        function setStatus(elementId, status, text) {
+            const el = document.getElementById(elementId);
+            el.className = `result-status ${status}`;
+            el.textContent = text || status.toUpperCase();
+        }
+
+        // ============================================
+        // API KEY VALIDATION
+        // ============================================
+        async function validateApiKey() {
+            const apiKey = getApiKey();
+            const resultEl = document.getElementById('keyValidationResult');
+
+            if (!apiKey) {
+                resultEl.innerHTML = '<span style="color: var(--accent-error);">❌ Please enter an API key</span>';
+                return;
+            }
+
+            resultEl.innerHTML = '<span class="spinner"></span> Validating...';
+
+            try {
+                // Simple test: list models
+                const response = await fetch(`${GEMINI_API_BASE_URL}/models?key=${apiKey}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const modelCount = data.models?.length || 0;
+                    resultEl.innerHTML = `<span style="color: var(--accent-success);">✅ API Key Valid! Found ${modelCount} available models.</span>`;
+                } else {
+                    const error = await response.json();
+                    resultEl.innerHTML = `<span style="color: var(--accent-error);">❌ Invalid: ${error.error?.message || response.statusText}</span>`;
+                }
+            } catch (error) {
+                resultEl.innerHTML = `<span style="color: var(--accent-error);">❌ Network error: ${error.message}</span>`;
+            }
+        }
+
+        // ============================================
+        // IMAGE GENERATION - Same flow as imageGenerator.ts
+        // ============================================
+        async function testImageGeneration() {
+            const apiKey = getApiKey();
+            if (!apiKey) {
+                alert('Please enter your API key first!');
+                return;
+            }
+
+            const prompt = document.getElementById('imagePrompt').value;
+            const aspectRatio = document.getElementById('imageAspectRatio').value;
+            const btn = document.getElementById('imageTestBtn');
+
+            clearLogs('imageLogs');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Generating...';
+            setStatus('imageStatus', 'pending', 'GENERATING...');
+            document.getElementById('imagePreview').innerHTML = '';
+
+            addLog('imageLogs', 'Starting image generation...', 'info');
+            addLog('imageLogs', `Model: ${MODELS.IMAGE}`, 'info');
+            addLog('imageLogs', `Aspect Ratio: ${aspectRatio}`, 'info');
+
+            // Build request body - EXACT same structure as imageGenerator.ts
+            const requestBody = {
+                contents: [{
+                    parts: [{
+                        text: prompt
+                    }]
+                }],
+                generationConfig: {
+                    responseModalities: ['IMAGE', 'TEXT']
+                }
+            };
+
+            document.getElementById('imageRequest').innerHTML = `<pre>${JSON.stringify(requestBody, null, 2)}</pre>`;
+
+            try {
+                addLog('imageLogs', `POST ${GEMINI_API_BASE_URL}/models/${MODELS.IMAGE}:generateContent`, 'info');
+
+                const response = await fetch(
+                    `${GEMINI_API_BASE_URL}/models/${MODELS.IMAGE}:generateContent?key=${apiKey}`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(requestBody),
+                    }
+                );
+
+                const responseData = await response.json();
+                document.getElementById('imageResponse').innerHTML = `<pre>${JSON.stringify(responseData, null, 2)}</pre>`;
+
+                if (!response.ok) {
+                    throw new Error(`API Error ${response.status}: ${responseData.error?.message || 'Unknown error'}`);
+                }
+
+                addLog('imageLogs', `Response status: ${response.status}`, 'success');
+
+                // Extract image from response - Same as imageGenerator.ts
+                let imageData = null;
+                const candidates = responseData.candidates;
+                if (candidates && candidates.length > 0) {
+                    const parts = candidates[0].content?.parts || [];
+                    for (const part of parts) {
+                        if (part.inlineData) {
+                            const { data, mimeType } = part.inlineData;
+                            if (data && mimeType?.startsWith('image/')) {
+                                imageData = { data, mimeType };
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (imageData) {
+                    setStatus('imageStatus', 'success', 'SUCCESS');
+                    addLog('imageLogs', `Image generated successfully! MimeType: ${imageData.mimeType}`, 'success');
+                    addLog('imageLogs', `Data size: ${(imageData.data.length * 0.75 / 1024).toFixed(2)} KB`, 'info');
+
+                    // Display image
+                    const imgEl = document.createElement('img');
+                    imgEl.src = `data:${imageData.mimeType};base64,${imageData.data}`;
+                    document.getElementById('imagePreview').appendChild(imgEl);
+                } else {
+                    // Check for text response
+                    const textPart = candidates?.[0]?.content?.parts?.find(p => p.text);
+                    if (textPart) {
+                        addLog('imageLogs', `Model returned text instead of image: ${textPart.text.substring(0, 200)}...`, 'warning');
+                    }
+                    throw new Error('No image was generated in the response');
+                }
+
+            } catch (error) {
+                setStatus('imageStatus', 'error', 'FAILED');
+                addLog('imageLogs', `Error: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🚀 Generate Image (REAL API CALL)';
+            }
+        }
+
+        // ============================================
+        // VIDEO GENERATION - Same flow as videoGenerator.ts
+        // ============================================
+        async function testVideoGeneration() {
+            const apiKey = getApiKey();
+            if (!apiKey) {
+                alert('Please enter your API key first!');
+                return;
+            }
+
+            const prompt = document.getElementById('videoPrompt').value;
+            const duration = parseInt(document.getElementById('videoDuration').value);
+            const aspectRatio = document.getElementById('videoAspectRatio').value;
+            const resolution = document.getElementById('videoResolution').value;
+            const btn = document.getElementById('videoTestBtn');
+
+            clearLogs('videoLogs');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Generating...';
+            setStatus('videoStatus', 'pending', 'STARTING...');
+            document.getElementById('videoPreview').innerHTML = '';
+            document.getElementById('videoProgress').classList.remove('hidden');
+
+            addLog('videoLogs', 'Starting video generation...', 'info');
+            addLog('videoLogs', `Model: ${MODELS.VIDEO}`, 'info');
+            addLog('videoLogs', `Duration: ${duration}s, Aspect: ${aspectRatio}, Resolution: ${resolution}`, 'info');
+            addLog('videoLogs', `Estimated cost: $${(duration * 0.15).toFixed(2)}`, 'info');
+
+            // Build request body - EXACT same structure as videoGenerator.ts
+            const requestBody = {
+                instances: [{
+                    prompt: prompt,
+                }],
+                parameters: {
+                    aspectRatio: aspectRatio,
+                    durationSeconds: duration,
+                    resolution: resolution,
+                    negativePrompt: 'cartoon, drawing, low quality, blur, text overlay, watermark, amateur',
+                },
+            };
+
+            document.getElementById('videoRequest').innerHTML = `<pre>${JSON.stringify(requestBody, null, 2)}</pre>`;
+
+            try {
+                // Step 1: Start video generation (long-running operation)
+                addLog('videoLogs', `POST ${GEMINI_API_BASE_URL}/models/${MODELS.VIDEO}:predictLongRunning`, 'info');
+
+                const startResponse = await fetch(
+                    `${GEMINI_API_BASE_URL}/models/${MODELS.VIDEO}:predictLongRunning`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-goog-api-key': apiKey,
+                        },
+                        body: JSON.stringify(requestBody),
+                    }
+                );
+
+                const startData = await startResponse.json();
+
+                if (!startResponse.ok) {
+                    document.getElementById('videoResponse').innerHTML = `<pre>${JSON.stringify(startData, null, 2)}</pre>`;
+                    throw new Error(`API Error ${startResponse.status}: ${startData.error?.message || 'Unknown error'}`);
+                }
+
+                const operationId = startData.name;
+                if (!operationId) {
+                    throw new Error('No operation ID returned from API');
+                }
+
+                addLog('videoLogs', `Operation started: ${operationId}`, 'success');
+                document.getElementById('videoOperationStatus').textContent = `Operation: ${operationId}`;
+
+                // Step 2: Poll for completion - Same logic as videoGenerator.ts
+                let attempts = 0;
+                let video = null;
+
+                while (attempts < MAX_POLL_ATTEMPTS) {
+                    attempts++;
+                    const progress = Math.min((attempts / MAX_POLL_ATTEMPTS) * 100, 95);
+                    document.querySelector('#videoProgress .fill').style.width = `${progress}%`;
+
+                    addLog('videoLogs', `Polling attempt ${attempts}/${MAX_POLL_ATTEMPTS}...`, 'info');
+                    setStatus('videoStatus', 'pending', `PROCESSING (${attempts}/${MAX_POLL_ATTEMPTS})`);
+
+                    const pollResponse = await fetch(
+                        `${GEMINI_API_BASE_URL}/${operationId}`,
+                        {
+                            method: 'GET',
+                            headers: {
+                                'x-goog-api-key': apiKey,
+                            },
+                        }
+                    );
+
+                    const pollData = await pollResponse.json();
+
+                    if (pollData.error) {
+                        throw new Error(`Operation failed: ${pollData.error.message}`);
+                    }
+
+                    if (pollData.done) {
+                        addLog('videoLogs', 'Video generation complete!', 'success');
+                        document.querySelector('#videoProgress .fill').style.width = '100%';
+                        document.getElementById('videoResponse').innerHTML = `<pre>${JSON.stringify(pollData, null, 2)}</pre>`;
+
+                        // Extract video URI - Same logic as videoGenerator.ts
+                        const videoUri =
+                            pollData.response?.generateVideoResponse?.generatedSamples?.[0]?.video?.uri ||
+                            pollData.response?.generatedVideos?.[0]?.video?.uri;
+
+                        if (videoUri) {
+                            addLog('videoLogs', `Video URI: ${videoUri}`, 'success');
+
+                            // Download video
+                            addLog('videoLogs', 'Downloading video...', 'info');
+                            const videoResponse = await fetch(videoUri, {
+                                headers: { 'x-goog-api-key': apiKey }
+                            });
+
+                            if (videoResponse.ok) {
+                                const videoBlob = await videoResponse.blob();
+                                const videoUrl = URL.createObjectURL(videoBlob);
+
+                                const videoEl = document.createElement('video');
+                                videoEl.src = videoUrl;
+                                videoEl.controls = true;
+                                videoEl.style.maxWidth = '100%';
+                                document.getElementById('videoPreview').appendChild(videoEl);
+
+                                addLog('videoLogs', `Video downloaded: ${(videoBlob.size / 1024 / 1024).toFixed(2)} MB`, 'success');
+                                setStatus('videoStatus', 'success', 'SUCCESS');
+                            } else {
+                                addLog('videoLogs', `Failed to download video: ${videoResponse.status}`, 'error');
+                            }
+                        } else {
+                            throw new Error('No video URI in response');
+                        }
+                        break;
+                    }
+
+                    // Wait before next poll - Same as app
+                    await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
+                }
+
+                if (attempts >= MAX_POLL_ATTEMPTS) {
+                    throw new Error('Video generation timed out');
+                }
+
+            } catch (error) {
+                setStatus('videoStatus', 'error', 'FAILED');
+                addLog('videoLogs', `Error: ${error.message}`, 'error');
+                document.getElementById('videoProgress').classList.add('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🚀 Generate Video (REAL API CALL)';
+            }
+        }
+
+        // Update cost estimate when duration changes
+        document.getElementById('videoDuration').addEventListener('change', function () {
+            const cost = (parseInt(this.value) * 0.15).toFixed(2);
+            document.getElementById('videoCostEstimate').innerHTML = `💰 Estimated Cost: $${cost} (${this.value} seconds × $0.15/sec)`;
+        });
+
+        // ============================================
+        // TEXT GENERATION - Same flow as textGenerator.ts
+        // ============================================
+        async function testTextGeneration() {
+            const apiKey = getApiKey();
+            if (!apiKey) {
+                alert('Please enter your API key first!');
+                return;
+            }
+
+            const systemPrompt = document.getElementById('textSystemPrompt').value;
+            const userPrompt = document.getElementById('textPrompt').value;
+            const btn = document.getElementById('textTestBtn');
+
+            clearLogs('textLogs');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Generating...';
+            setStatus('textStatus', 'pending', 'GENERATING...');
+
+            addLog('textLogs', 'Starting text generation...', 'info');
+            addLog('textLogs', `Model: ${MODELS.TEXT}`, 'info');
+
+            // Build request body - Same structure as textGenerator.ts
+            const requestBody = {
+                system_instruction: {
+                    parts: [{ text: systemPrompt }]
+                },
+                contents: [{
+                    role: 'user',
+                    parts: [{ text: userPrompt }]
+                }],
+                generationConfig: {
+                    temperature: 0.7,
+                    maxOutputTokens: 2048,
+                }
+            };
+
+            document.getElementById('textRequest').innerHTML = `<pre>${JSON.stringify(requestBody, null, 2)}</pre>`;
+
+            try {
+                addLog('textLogs', `POST ${GEMINI_API_BASE_URL}/models/${MODELS.TEXT}:generateContent`, 'info');
+
+                const response = await fetch(
+                    `${GEMINI_API_BASE_URL}/models/${MODELS.TEXT}:generateContent?key=${apiKey}`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(requestBody),
+                    }
+                );
+
+                const responseData = await response.json();
+                document.getElementById('textResponse').innerHTML = `<pre>${JSON.stringify(responseData, null, 2)}</pre>`;
+
+                if (!response.ok) {
+                    throw new Error(`API Error ${response.status}: ${responseData.error?.message || 'Unknown error'}`);
+                }
+
+                addLog('textLogs', `Response status: ${response.status}`, 'success');
+
+                // Extract text from response
+                const text = responseData.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (text) {
+                    addLog('textLogs', `Generated ${text.length} characters`, 'success');
+                    setStatus('textStatus', 'success', 'SUCCESS');
+                }
+
+                // Show token usage if available
+                const usageMetadata = responseData.usageMetadata;
+                if (usageMetadata) {
+                    const inputTokens = usageMetadata.promptTokenCount || 0;
+                    const outputTokens = usageMetadata.candidatesTokenCount || 0;
+                    const cachedTokens = usageMetadata.cachedContentTokenCount || 0;
+
+                    // Calculate cost (Gemini 2.5 Flash pricing)
+                    const inputCost = (inputTokens / 1000000) * 0.30;
+                    const outputCost = (outputTokens / 1000000) * 2.50;
+                    const totalCost = inputCost + outputCost;
+
+                    document.getElementById('tokenUsage').innerHTML = `
+            Input: ${inputTokens.toLocaleString()} tokens ($${inputCost.toFixed(6)})<br>
+            Output: ${outputTokens.toLocaleString()} tokens ($${outputCost.toFixed(6)})<br>
+            Cached: ${cachedTokens.toLocaleString()} tokens<br>
+            <strong>Total Cost: $${totalCost.toFixed(6)}</strong>
+          `;
+                    addLog('textLogs', `Tokens: ${inputTokens} in, ${outputTokens} out, Cost: $${totalCost.toFixed(6)}`, 'info');
+                }
+
+            } catch (error) {
+                setStatus('textStatus', 'error', 'FAILED');
+                addLog('textLogs', `Error: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🚀 Generate Text (REAL API CALL)';
+            }
+        }
+
+        // ============================================
+        // DIAGNOSTICS
+        // ============================================
+        async function runDiagnostics() {
+            const apiKey = getApiKey();
+            const logs = document.getElementById('diagnosticsLogs');
+            logs.innerHTML = '';
+
+            if (!apiKey) {
+                logs.innerHTML = '<div class="log-entry error">❌ Please enter an API key first</div>';
+                return;
+            }
+
+            const addDiagLog = (msg, type = 'info') => {
+                logs.innerHTML += `<div class="log-entry ${type}">[${getTimestamp()}] ${msg}</div>`;
+            };
+
+            addDiagLog('Starting API diagnostics...', 'info');
+
+            // Test 1: API Key validation
+            try {
+                addDiagLog('Testing API key...', 'info');
+                const response = await fetch(`${GEMINI_API_BASE_URL}/models?key=${apiKey}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    addDiagLog(`✅ API key valid. ${data.models?.length || 0} models available.`, 'success');
+                } else {
+                    const error = await response.json();
+                    addDiagLog(`❌ API key invalid: ${error.error?.message}`, 'error');
+                    return;
+                }
+            } catch (e) {
+                addDiagLog(`❌ Network error: ${e.message}`, 'error');
+                return;
+            }
+
+            // Test 2: Check specific models
+            const modelsToCheck = [
+                { name: 'gemini-2.5-flash', type: 'Text' },
+                { name: 'gemini-2.5-flash-image', type: 'Image' },
+                { name: 'veo-3.1-fast-generate-preview', type: 'Video' },
+            ];
+
+            for (const model of modelsToCheck) {
+                try {
+                    addDiagLog(`Checking ${model.type} model: ${model.name}...`, 'info');
+                    const response = await fetch(`${GEMINI_API_BASE_URL}/models/${model.name}?key=${apiKey}`);
+                    if (response.ok) {
+                        addDiagLog(`✅ ${model.type} model available: ${model.name}`, 'success');
+                    } else {
+                        const error = await response.json();
+                        addDiagLog(`⚠️ ${model.type} model issue: ${error.error?.message}`, 'warning');
+                    }
+                } catch (e) {
+                    addDiagLog(`❌ Error checking ${model.name}: ${e.message}`, 'error');
+                }
+            }
+
+            addDiagLog('Diagnostics complete!', 'success');
+        }
+    </script>
+</body>
+
+</html>

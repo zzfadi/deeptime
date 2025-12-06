@@ -16,3 +16,6 @@ export { usePWAInstall } from './usePWAInstall';
 
 export { useIdleFade, DEFAULT_IDLE_TIMEOUT, IDLE_OPACITY, ACTIVE_OPACITY } from './useIdleFade';
 export type { UseIdleFadeOptions, UseIdleFadeResult } from './useIdleFade';
+
+export { useCacheInitialization } from './useCacheInitialization';
+export type { CacheInitializationState, CacheInitializationOptions } from './useCacheInitialization';

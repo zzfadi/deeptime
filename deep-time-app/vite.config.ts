@@ -100,6 +100,15 @@ export default defineConfig({
       'deep-time-core': path.resolve(__dirname, '../src')
     }
   },
+  server: {
+    proxy: {
+      '/api/usgs': {
+        target: 'https://mrdata.usgs.gov',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/usgs/, '')
+      }
+    }
+  },
   build: {
     rollupOptions: {
       output: {

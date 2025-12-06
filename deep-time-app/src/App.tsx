@@ -10,7 +10,7 @@ import { useEffect, useState, useCallback, lazy, Suspense } from 'react';
 import { useAppStore } from './store/appStore';
 import { Home } from './pages';
 import { FullPageSpinner, InstallBanner, ApiKeyModal, hasApiKey } from './components';
-import { useWebXRSupport } from './hooks';
+import { useWebXRSupport, useCacheInitialization } from './hooks';
 import { arFallbackDetector } from './ar/ARFallbackDetector';
 
 // Lazy load EraDetail page for code splitting
@@ -31,8 +31,29 @@ function App() {
   const [arChecked, setArChecked] = useState(false);
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
   const [apiKeyConfigured, setApiKeyConfigured] = useState(hasApiKey());
-  const { setOfflineStatus, setViewMode, currentEra, narrative, isNarrativeLoading } = useAppStore();
+  const { setOfflineStatus, setViewMode, currentEra, narrative, isNarrativeLoading, location } = useAppStore();
   const webXRSupport = useWebXRSupport();
+  
+  // Initialize cache on app startup
+  // Requirement 10.2: Load cached content from IndexedDB on app init
+  // Property 36: Cache load on startup
+  const { isInitialized: cacheInitialized, cacheStats } = useCacheInitialization({
+    maxEntries: 100,
+    recentDays: 30,
+    onComplete: (result) => {
+      console.log(`[App] Cache initialized: ${result.entriesLoaded} entries loaded`);
+    },
+    onError: (error) => {
+      console.warn(`[App] Cache initialization warning: ${error}`);
+    },
+  });
+  
+  // Log cache stats when available
+  useEffect(() => {
+    if (cacheStats && cacheInitialized) {
+      console.log(`[App] Cache stats: ${cacheStats.totalEntries} entries, ${(cacheStats.totalSize / 1024).toFixed(1)}KB, ${(cacheStats.hitRate * 100).toFixed(1)}% hit rate`);
+    }
+  }, [cacheStats, cacheInitialized]);
 
   // Show API key prompt on first load if no key configured
   useEffect(() => {
@@ -168,6 +189,7 @@ function App() {
             era={currentEra}
             narrative={narrative}
             isLoading={isNarrativeLoading}
+            location={location}
             onBack={handleBackToHome}
             onARClick={handleARClick}
           />

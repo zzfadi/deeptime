@@ -14,9 +14,9 @@ Upgraded from **Gemini 1.5 Flash** (deprecated) to **Gemini 2.5 models** for imp
 - `gemini-1.5-flash` (deprecated)
 
 **After**: Optimized model per use case
-- `gemini-2.5-flash-8b` - Real-time AR interactions
+- `gemini-2.5-flash-lite` - Real-time AR interactions
 - `gemini-2.5-flash` - Detailed narratives
-- `gemini-2.5-pro` - Future advanced features
+- `gemini-3-pro` - Future advanced features
 
 ### 2. Files Modified
 
@@ -32,7 +32,7 @@ Upgraded from **Gemini 1.5 Flash** (deprecated) to **Gemini 2.5 models** for imp
 
 ## Model Assignment
 
-### Gemini 2.5 Flash-8B (Primary)
+### Gemini 2.5 flash-lite (Primary)
 **Use Cases**:
 - ✅ Creature tap narrations (AR)
 - ✅ Era welcome messages (AR)
@@ -46,8 +46,8 @@ Upgraded from **Gemini 1.5 Flash** (deprecated) to **Gemini 2.5 models** for imp
 
 **Code**:
 ```typescript
-MODEL_USE_CASES.CREATURE_NARRATION = 'gemini-2.5-flash-8b'
-MODEL_USE_CASES.ERA_WELCOME = 'gemini-2.5-flash-8b'
+MODEL_USE_CASES.CREATURE_NARRATION = 'gemini-2.5-flash-lite'
+MODEL_USE_CASES.ERA_WELCOME = 'gemini-2.5-flash-lite'
 ```
 
 ### Gemini 2.5 Flash (Secondary)
@@ -67,7 +67,7 @@ MODEL_USE_CASES.ERA_WELCOME = 'gemini-2.5-flash-8b'
 MODEL_USE_CASES.ERA_NARRATIVE = 'gemini-2.5-flash'
 ```
 
-### Gemini 2.5 Pro (Future)
+### Gemini 3 Pro (Future)
 **Use Cases**:
 - 🔮 Educational quiz generation
 - 🔮 Personalized learning paths
@@ -81,8 +81,8 @@ MODEL_USE_CASES.ERA_NARRATIVE = 'gemini-2.5-flash'
 
 **Code**:
 ```typescript
-MODEL_USE_CASES.QUIZ_GENERATION = 'gemini-2.5-pro'
-MODEL_USE_CASES.PERSONALIZATION = 'gemini-2.5-pro'
+MODEL_USE_CASES.QUIZ_GENERATION = 'gemini-3-pro'
+MODEL_USE_CASES.PERSONALIZATION = 'gemini-3-pro'
 ```
 
 ---
@@ -93,15 +93,15 @@ MODEL_USE_CASES.PERSONALIZATION = 'gemini-2.5-pro'
 
 | Feature | Old Model | New Model | Improvement |
 |---------|-----------|-----------|-------------|
-| Creature Narration | gemini-1.5-flash<br/>~800ms | gemini-2.5-flash-8b<br/>~350ms | **56% faster** |
-| Era Welcome | gemini-1.5-flash<br/>~800ms | gemini-2.5-flash-8b<br/>~350ms | **56% faster** |
+| Creature Narration | gemini-1.5-flash<br/>~800ms | gemini-2.5-flash-lite<br/>~350ms | **56% faster** |
+| Era Welcome | gemini-1.5-flash<br/>~800ms | gemini-2.5-flash-lite<br/>~350ms | **56% faster** |
 | Era Narrative | gemini-1.5-flash<br/>~800ms | gemini-2.5-flash<br/>~700ms | **12% faster** |
 
 ### Cost Reduction
 
 **Free Tier Limits** (per day):
 - Old: 1,500 requests @ ~$0.001/request equivalent
-- New (Flash-8B): 4,000 requests @ ~$0.0003/request equivalent
+- New (flash-lite): 4,000 requests @ ~$0.0003/request equivalent
 - **Result**: ~3x more requests in free tier
 
 **Estimated Daily Usage**:
@@ -141,8 +141,8 @@ MODEL_USE_CASES.PERSONALIZATION = 'gemini-2.5-pro'
 - Fast 4G: ~900ms total latency
 
 **After**:
-- Slow 4G: ~550ms total latency (Flash-8B)
-- Fast 4G: ~400ms total latency (Flash-8B)
+- Slow 4G: ~550ms total latency (flash-lite)
+- Fast 4G: ~400ms total latency (flash-lite)
 - **~50% improvement on mobile**
 
 ---
@@ -155,9 +155,9 @@ MODEL_USE_CASES.PERSONALIZATION = 'gemini-2.5-pro'
 // deep-time-app/src/config/aiModels.ts
 
 export const GEMINI_MODELS = {
-  FLASH_LITE: 'gemini-2.5-flash-8b',  // Fastest
+  FLASH_LITE: 'gemini-2.5-flash-lite',  // Fastest
   FLASH: 'gemini-2.5-flash',          // Balanced
-  PRO: 'gemini-2.5-pro',              // Most powerful
+  PRO: 'gemini-3-pro',              // Most powerful
 } as const;
 
 export const MODEL_USE_CASES = {
@@ -174,7 +174,7 @@ export const MODEL_USE_CASES = {
 ```typescript
 // Creature narration (AR tap)
 const model = client.getGenerativeModel({ 
-  model: MODEL_USE_CASES.CREATURE_NARRATION  // flash-8b
+  model: MODEL_USE_CASES.CREATURE_NARRATION  // flash-lite
 });
 
 // Era narrative (detailed)
@@ -189,8 +189,8 @@ const model = client.getGenerativeModel({
 
 ### 1. Verify Model Availability
 ```bash
-# Test Flash-8B
-curl -X POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-8b:generateContent \
+# Test flash-lite
+curl -X POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent \
   -H "Content-Type: application/json" \
   -H "x-goog-api-key: YOUR_API_KEY" \
   -d '{"contents":[{"parts":[{"text":"Hello"}]}]}'
@@ -213,7 +213,7 @@ console.log(`Model latency: ${latency}ms`);
 
 ### 3. Monitor Quality
 - Compare narration quality between models
-- Ensure Flash-8B maintains acceptable quality for AR
+- Ensure flash-lite maintains acceptable quality for AR
 - Verify Flash provides better reasoning for era narratives
 
 ### 4. Test Fallbacks
@@ -267,7 +267,7 @@ ERA_NARRATIVE: 'gemini-2.5-flash',
 ## Future Enhancements
 
 ### 1. A/B Testing
-- Test Flash-8B vs Flash for creature narrations
+- Test flash-lite vs Flash for creature narrations
 - Measure quality vs speed tradeoff
 - Optimize based on user feedback
 
@@ -280,9 +280,9 @@ const model = isSlowNetwork()
 ```
 
 ### 3. Caching Strategy
-- Cache Flash-8B responses more aggressively
+- Cache flash-lite responses more aggressively
 - Use Flash for first-time narrations
-- Use Flash-8B for repeat narrations
+- Use flash-lite for repeat narrations
 
 ### 4. Pro Model Features
 - Educational quiz generation
@@ -295,21 +295,21 @@ const model = isSlowNetwork()
 ## References
 
 - [Gemini Models Documentation](https://ai.google.dev/gemini-api/docs/models)
-- [Gemini 2.5 Flash-8B](https://ai.google.dev/gemini-api/docs/models/gemini-2.5-flash-8b)
+- [Gemini 2.5 flash-lite](https://ai.google.dev/gemini-api/docs/models/gemini-2.5-flash-lite)
 - [Gemini 2.5 Flash](https://ai.google.dev/gemini-api/docs/models/gemini-2.5-flash)
-- [Gemini 2.5 Pro](https://ai.google.dev/gemini-api/docs/models/gemini-2.5-pro)
+- [Gemini 3 Pro](https://ai.google.dev/gemini-api/docs/models/gemini-3-pro)
 
 ---
 
 ## Questions & Answers
 
 **Q: Why not use Pro for everything?**
-A: Pro is slower and more expensive. Flash-8B is 3-4x faster and much cheaper for simple tasks like creature narrations.
+A: Pro is slower and more expensive. flash-lite is 3-4x faster and much cheaper for simple tasks like creature narrations.
 
-**Q: Will quality suffer with Flash-8B?**
-A: Flash-8B is optimized for speed but maintains good quality for short, conversational text. Era narratives use Flash for better reasoning.
+**Q: Will quality suffer with flash-lite?**
+A: flash-lite is optimized for speed but maintains good quality for short, conversational text. Era narratives use Flash for better reasoning.
 
-**Q: What if Flash-8B isn't available?**
+**Q: What if flash-lite isn't available?**
 A: The fallback system still works - pre-written narrations will be used if any model fails.
 
 **Q: Can users choose their model?**
