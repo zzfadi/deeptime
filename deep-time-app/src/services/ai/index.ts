@@ -232,3 +232,17 @@ export {
   calculateCostSaved,
   calculateCacheHitRate,
 } from './cacheHitMonitor';
+
+// Glyph Generator exports (AI-generated era icons)
+export type {
+  GlyphShape,
+  GlyphColor,
+  GlyphElement,
+  GlyphCode,
+} from './glyphGenerator';
+export {
+  generateGlyphCode,
+  parseGlyphCode,
+  stringifyGlyphCode,
+  getDefaultGlyphCode,
+} from './glyphGenerator';

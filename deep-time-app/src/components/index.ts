@@ -62,3 +62,7 @@ export type { ControlPanelProps } from './ControlPanel';
 
 export { FloatingControlButton } from './FloatingControlButton';
 export type { FloatingControlButtonProps } from './FloatingControlButton';
+
+// AI-generated Fossil Glyph icons for eras
+export { FossilGlyph } from './FossilGlyph';
+export type { FossilGlyphProps } from './FossilGlyph';

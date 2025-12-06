@@ -6,6 +6,8 @@
 
 import type { GeologicalLayer, Narrative } from 'deep-time-core/types';
 import { formatYearsAgo } from './TimeSlider';
+import { FossilGlyph } from './FossilGlyph';
+import { useEraGlyph } from '../hooks/useEraGlyph';
 
 export interface EraCardProps {
   era: GeologicalLayer | null;
@@ -87,6 +89,13 @@ export function EraCard({ era, narrative, isLoading, onARClick, webXRSupported =
   if (!era) return <EraCardSkeleton />;
 
   const theme = getEraTheme(era.era.name);
+  
+  // Use AI-generated fossil glyph
+  const { glyphCode, isLoading: glyphLoading } = useEraGlyph({
+    eraName: era.era.name,
+    narrative,
+    enabled: true,
+  });
 
   return (
     <div
@@ -97,10 +106,10 @@ export function EraCard({ era, narrative, isLoading, onARClick, webXRSupported =
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
             <div
-              className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl"
-              style={{ background: `linear-gradient(135deg, ${theme.accent}30, ${theme.accent}10)` }}
+              className="w-14 h-14 rounded-xl flex items-center justify-center overflow-hidden"
+              style={{ background: `linear-gradient(135deg, ${theme.accent}20, ${theme.accent}05)` }}
             >
-              {theme.icon}
+              <FossilGlyph code={glyphCode} size={56} animate={glyphLoading} />
             </div>
             <div>
               <h2 className="text-xl font-bold text-white">{era.era.name}</h2>

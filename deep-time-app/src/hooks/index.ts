@@ -19,3 +19,6 @@ export type { UseIdleFadeOptions, UseIdleFadeResult } from './useIdleFade';
 
 export { useCacheInitialization } from './useCacheInitialization';
 export type { CacheInitializationState, CacheInitializationOptions } from './useCacheInitialization';
+
+export { useEraGlyph } from './useEraGlyph';
+export type { default as UseEraGlyphResult } from './useEraGlyph';
