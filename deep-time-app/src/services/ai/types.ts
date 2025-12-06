@@ -453,8 +453,12 @@ export const INPUT_COST_PER_1M = 0.30;
 /** Cost per 1M output tokens (Gemini 2.5 Flash) */
 export const OUTPUT_COST_PER_1M = 2.50;
 
-/** Cost per 1M cached tokens (75% discount) */
-export const CACHED_COST_PER_1M = 0.075;
+/** 
+ * Cost per 1M cached tokens (90% discount)
+ * Requirement 2.1: Apply the correct 90% discount rate of $0.03 per 1M tokens
+ * This is 10× cheaper than the full input price of $0.30 per 1M tokens
+ */
+export const CACHED_COST_PER_1M = 0.03;
 
 /** Cost per image by resolution */
 export const IMAGE_COST_BY_RESOLUTION: Record<MediaResolution, number> = {

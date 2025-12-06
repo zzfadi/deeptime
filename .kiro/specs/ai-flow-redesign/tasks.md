@@ -19,9 +19,10 @@
   - Implement migration from existing schema
   - _Requirements: 5.1, 11.1_
 
-- [ ]* 1.3 Write property test for cache key generation
+- [x]* 1.3 Write property test for cache key generation
   - **Property 18: Cache key format**
   - **Validates: Requirements 5.1**
+  - _Note: Covered in tests/cache/cacheManager.property.test.ts (Property 40 tests)_
 
 - [x] 2. Implement Prompt Builder service
   - Create prompt template system
@@ -108,6 +109,8 @@
 - [ ] 4.3 Write property test for image prompt completeness
   - **Property 11: Image prompt completeness**
   - **Validates: Requirements 3.3**
+  - Create tests/image/imageGenerator.property.test.ts
+  - Test that buildImagePrompt includes flora, fauna, climate, geological features
 
 - [ ]* 4.4 Write property test for image cost logging
   - **Property 41: Image cost logging**
@@ -408,21 +411,22 @@
   - **Property 31: Explicit cache creation**
   - **Validates: Requirements 8.4**
 
-- [ ]* 12.4 Write property test for cache hit logging
+- [x]* 12.4 Write property test for cache hit logging
   - **Property 30: Cache hit logging**
   - **Validates: Requirements 8.3**
+  - _Note: Covered in tests/explicitCache/explicitCache.property.test.ts (Property 30 tests)_
 
 - [x] 13. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 14. Create cost monitoring dashboard (optional)
+- [ ]* 14. Create cost monitoring dashboard (optional)
   - Build admin dashboard for cost tracking
   - Display daily/monthly cost trends
   - Show cache hit rates
   - Display API usage statistics
   - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5_
 
-- [ ] 15. Implement preloading optimization (optional)
+- [ ]* 15. Implement preloading optimization (optional)
   - Preload content for adjacent eras
   - Use idle time for background generation
   - Prioritize based on user navigation patterns

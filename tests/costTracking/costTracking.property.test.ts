@@ -87,6 +87,143 @@ function expectedTextCost(
 
 describe('Cost Tracking Properties', () => {
   /**
+   * **Feature: pre-deployment-optimization, Property 4: Cached token cost calculation**
+   * **Validates: Requirements 2.1**
+   * 
+   * *For any* positive number of cached tokens, the calculated cost should equal 
+   * (tokens / 1,000,000) × 0.03
+   */
+  describe('Property 4: Cached token cost calculation', () => {
+    it('cached token cost should equal (tokens / 1,000,000) × 0.03', () => {
+      fc.assert(
+        fc.property(
+          fc.integer({ min: 1, max: 10_000_000 }),
+          (cachedTokens) => {
+            // Calculate cost using only cached tokens (no input or output)
+            const cost = calculateTextCost(cachedTokens, 0, cachedTokens);
+            
+            // Expected cost: (cachedTokens / 1,000,000) × 0.03
+            const expectedCost = (cachedTokens / 1_000_000) * CACHED_COST_PER_1M;
+            
+            expect(cost).toBeCloseTo(expectedCost, 10);
+            return Math.abs(cost - expectedCost) < 0.0000001;
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('CACHED_COST_PER_1M should be 0.03 (90% discount)', () => {
+      // Requirement 2.1: Apply the correct 90% discount rate of $0.03 per 1M tokens
+      expect(CACHED_COST_PER_1M).toBe(0.03);
+    });
+
+    it('cached tokens should receive 90% discount compared to input tokens', () => {
+      fc.assert(
+        fc.property(
+          fc.integer({ min: 1000, max: 1_000_000 }),
+          (tokens) => {
+            // Cost if all tokens are non-cached input
+            const inputOnlyCost = (tokens / 1_000_000) * INPUT_COST_PER_1M;
+            
+            // Cost if all tokens are cached
+            const cachedOnlyCost = (tokens / 1_000_000) * CACHED_COST_PER_1M;
+            
+            // Cached cost should be 10% of input cost (90% discount)
+            // 0.03 / 0.30 = 0.1 = 10%
+            const discountRatio = cachedOnlyCost / inputOnlyCost;
+            
+            expect(discountRatio).toBeCloseTo(0.1, 5);
+            return Math.abs(discountRatio - 0.1) < 0.0001;
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  /**
+   * **Feature: pre-deployment-optimization, Property 5: Cost report structure**
+   * **Validates: Requirements 2.2**
+   * 
+   * *For any* generated cost report, the report should contain distinct fields 
+   * for cached token costs and uncached token costs
+   */
+  describe('Property 5: Cost report structure', () => {
+    it('TokenUsage should contain distinct fields for cached and uncached tokens', () => {
+      fc.assert(
+        fc.property(textCostInputArb, ({ inputTokens, outputTokens, cachedTokens }) => {
+          const tokenUsage = createTokenUsage(inputTokens, outputTokens, cachedTokens);
+          
+          // TokenUsage should have distinct fields for tracking
+          expect(tokenUsage).toHaveProperty('inputTokens');
+          expect(tokenUsage).toHaveProperty('outputTokens');
+          expect(tokenUsage).toHaveProperty('cachedTokens');
+          expect(tokenUsage).toHaveProperty('totalCost');
+          
+          // Values should match what was passed in
+          expect(tokenUsage.inputTokens).toBe(inputTokens);
+          expect(tokenUsage.outputTokens).toBe(outputTokens);
+          expect(tokenUsage.cachedTokens).toBe(cachedTokens);
+          
+          return true;
+        }),
+        { numRuns: 100 }
+      );
+    });
+
+    it('cost calculation should distinguish between cached and uncached input tokens', () => {
+      fc.assert(
+        fc.property(
+          fc.integer({ min: 1000, max: 100000 }),
+          fc.integer({ min: 100, max: 10000 }),
+          fc.integer({ min: 0, max: 50000 }),
+          (inputTokens, outputTokens, cachedTokens) => {
+            // Ensure cachedTokens doesn't exceed inputTokens
+            const actualCachedTokens = Math.min(cachedTokens, inputTokens);
+            
+            const tokenUsage = createTokenUsage(inputTokens, outputTokens, actualCachedTokens);
+            
+            // Calculate expected costs separately
+            const nonCachedInputTokens = Math.max(0, inputTokens - actualCachedTokens);
+            const expectedInputCost = (nonCachedInputTokens / 1_000_000) * INPUT_COST_PER_1M;
+            const expectedOutputCost = (outputTokens / 1_000_000) * OUTPUT_COST_PER_1M;
+            const expectedCachedCost = (actualCachedTokens / 1_000_000) * CACHED_COST_PER_1M;
+            const expectedTotalCost = expectedInputCost + expectedOutputCost + expectedCachedCost;
+            
+            // Total cost should reflect the distinction
+            expect(tokenUsage.totalCost).toBeCloseTo(expectedTotalCost, 10);
+            
+            return true;
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('DailyCostRecord should have separate fields for different cost types', () => {
+      fc.assert(
+        fc.property(consistentDailyCostRecordArb, (record) => {
+          // DailyCostRecord should have distinct fields for each cost type
+          expect(record).toHaveProperty('textCost');
+          expect(record).toHaveProperty('imageCost');
+          expect(record).toHaveProperty('videoCost');
+          expect(record).toHaveProperty('totalCost');
+          
+          // All cost fields should be numbers
+          expect(typeof record.textCost).toBe('number');
+          expect(typeof record.imageCost).toBe('number');
+          expect(typeof record.videoCost).toBe('number');
+          expect(typeof record.totalCost).toBe('number');
+          
+          return true;
+        }),
+        { numRuns: 100 }
+      );
+    });
+  });
+
+  /**
    * **Feature: ai-flow-redesign, Property 43: Usage threshold alerts**
    * **Validates: Requirements 11.5**
    * 
@@ -355,6 +492,31 @@ describe('Cost Tracking Properties', () => {
         }),
         { numRuns: 100 }
       );
+    });
+  });
+
+  /**
+   * **Feature: pre-deployment-optimization, Example 2: Cached token pricing constant**
+   * **Validates: Requirements 2.3**
+   * 
+   * Verify that CACHED_COST_PER_1M equals 0.03
+   */
+  describe('Example 2: Cached token pricing constant', () => {
+    it('CACHED_COST_PER_1M should equal 0.03', () => {
+      // Requirement 2.3: Use the constant value 0.03 for cached token pricing
+      expect(CACHED_COST_PER_1M).toBe(0.03);
+    });
+
+    it('cached token pricing should represent 90% discount from input pricing', () => {
+      // Input cost is $0.30 per 1M tokens
+      // Cached cost should be $0.03 per 1M tokens (90% discount)
+      const discountPercentage = ((INPUT_COST_PER_1M - CACHED_COST_PER_1M) / INPUT_COST_PER_1M) * 100;
+      expect(discountPercentage).toBeCloseTo(90, 5);
+    });
+
+    it('1 million cached tokens should cost exactly $0.03', () => {
+      const cost = calculateTextCost(1_000_000, 0, 1_000_000);
+      expect(cost).toBe(0.03);
     });
   });
 });

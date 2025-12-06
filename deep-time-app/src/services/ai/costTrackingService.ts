@@ -124,11 +124,12 @@ const DEFAULT_CONFIG: CostTrackingConfig = {
 /**
  * Calculate text generation cost from token usage
  * Requirement 11.1: Log token counts for input, output, and cached tokens
+ * Requirement 2.1: Apply the correct 90% discount rate of $0.03 per 1M tokens
  * Property 39: Token count logging
  * 
  * @param inputTokens - Number of input tokens
  * @param outputTokens - Number of output tokens
- * @param cachedTokens - Number of cached tokens (75% discount)
+ * @param cachedTokens - Number of cached tokens (90% discount - $0.03 per 1M)
  * @returns Cost in USD
  */
 export function calculateTextCost(

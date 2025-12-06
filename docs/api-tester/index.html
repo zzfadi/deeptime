@@ -1,27 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deep Time AI API Tester</title>
-    <meta name="description"
-        content="Test and troubleshoot Gemini and Veo API calls - 1:1 match with Deep Time App flow">
+    <title>Deep Time API Laboratory</title>
+    <meta name="description" content="Geological AI Console — Test Gemini & Veo APIs">
+    
+    <!-- Distinctive fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --bg-dark: #0f0f1a;
-            --bg-card: #1a1a2e;
-            --bg-input: #252540;
-            --accent-primary: #7c3aed;
-            --accent-secondary: #06b6d4;
-            --accent-success: #10b981;
-            --accent-warning: #f59e0b;
-            --accent-error: #ef4444;
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --border-color: #334155;
-            --gradient-primary: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+            /* Amber CRT palette */
+            --amber-glow: #ffb000;
+            --amber-dim: #cc8800;
+            --amber-bright: #ffd966;
+            --amber-text: #ffe4a0;
+            
+            /* Deep geological darks */
+            --obsidian: #0a0a0c;
+            --basalt: #12121a;
+            --slate: #1a1a24;
+            --shale: #252532;
+            
+            /* Accent minerals */
+            --malachite: #00d9a0;
+            --azurite: #00a8ff;
+            --cinnabar: #ff4444;
+            --sulfur: #e8e800;
+            
+            /* Functional */
+            --success: var(--malachite);
+            --warning: var(--sulfur);
+            --error: var(--cinnabar);
+            --info: var(--azurite);
+            
+            /* Typography */
+            --font-mono: 'IBM Plex Mono', 'Fira Code', monospace;
+            --font-display: 'Instrument Serif', Georgia, serif;
         }
 
         * {
@@ -30,66 +48,164 @@
             box-sizing: border-box;
         }
 
+        html {
+            font-size: 15px;
+        }
+
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-primary);
+            font-family: var(--font-mono);
+            background: var(--obsidian);
+            color: var(--amber-text);
             min-height: 100vh;
             line-height: 1.6;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Scanline overlay - exclude media previews */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.15) 2px,
+                rgba(0, 0, 0, 0.15) 4px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* CRT vignette - exclude media previews */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(
+                ellipse at center,
+                transparent 0%,
+                transparent 60%,
+                rgba(0, 0, 0, 0.4) 100%
+            );
+            pointer-events: none;
+            z-index: 9998;
+        }
+
+        /* Noise texture - exclude media previews */
+        .noise-overlay {
+            position: fixed;
+            inset: 0;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9997;
+        }
+
+        /* Media preview - higher z-index to appear above overlays */
+        .media-preview {
+            position: relative;
+            z-index: 10000;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 2rem 1.5rem;
+            position: relative;
         }
 
-        /* Header */
+        /* ===== HEADER ===== */
         header {
             text-align: center;
-            padding: 2rem 0 3rem;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 2rem;
+            padding: 3rem 0 2.5rem;
+            position: relative;
+        }
+
+        .logo-mark {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            border: 2px solid var(--amber-dim);
+            border-radius: 50%;
+            margin-bottom: 1.5rem;
+            position: relative;
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+
+        .logo-mark::before {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            border: 1px solid var(--amber-dim);
+            border-radius: 50%;
+            opacity: 0.3;
+        }
+
+        .logo-mark svg {
+            width: 40px;
+            height: 40px;
+            fill: var(--amber-glow);
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 176, 0, 0.2); }
+            50% { box-shadow: 0 0 40px rgba(255, 176, 0, 0.4); }
         }
 
         h1 {
-            font-size: 2.5rem;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-family: var(--font-display);
+            font-size: 2.8rem;
+            font-weight: 400;
+            font-style: italic;
+            color: var(--amber-glow);
+            letter-spacing: -0.02em;
             margin-bottom: 0.5rem;
+            text-shadow: 0 0 30px rgba(255, 176, 0, 0.3);
         }
 
         .subtitle {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
+            font-size: 0.8rem;
+            color: var(--amber-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
         }
 
-        /* API Key Section */
+        .header-line {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--amber-dim), transparent);
+            margin-top: 2rem;
+        }
+
+        /* ===== API KEY SECTION ===== */
         .api-key-section {
-            background: var(--bg-card);
-            border-radius: 12px;
+            background: var(--basalt);
+            border: 1px solid var(--shale);
             padding: 1.5rem;
             margin-bottom: 2rem;
-            border: 1px solid var(--border-color);
+            position: relative;
         }
 
-        .api-key-section h2 {
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
+        .api-key-section::before {
+            content: 'AUTHENTICATION';
+            position: absolute;
+            top: -0.6rem;
+            left: 1rem;
+            background: var(--basalt);
+            padding: 0 0.5rem;
+            font-size: 0.65rem;
+            color: var(--amber-dim);
+            letter-spacing: 0.2em;
+        }
+
+        .input-row {
             display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .api-key-section h2::before {
-            content: '🔑';
-        }
-
-        .input-group {
-            display: flex;
-            gap: 1rem;
+            gap: 0.75rem;
+            align-items: stretch;
         }
 
         input[type="password"],
@@ -98,107 +214,197 @@
         select {
             flex: 1;
             padding: 0.75rem 1rem;
-            background: var(--bg-input);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-size: 1rem;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            background: var(--obsidian);
+            border: 1px solid var(--shale);
+            color: var(--amber-text);
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
         }
 
         input:focus,
         textarea:focus,
         select:focus {
             outline: none;
-            border-color: var(--accent-primary);
-            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+            border-color: var(--amber-dim);
+            box-shadow: 0 0 0 1px var(--amber-dim), inset 0 0 20px rgba(255, 176, 0, 0.05);
         }
 
+        input::placeholder,
+        textarea::placeholder {
+            color: rgba(255, 228, 160, 0.3);
+        }
+
+        /* Buttons */
         button {
-            padding: 0.75rem 1.5rem;
-            background: var(--gradient-primary);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-size: 1rem;
-            font-weight: 600;
+            padding: 0.75rem 1.25rem;
+            background: transparent;
+            border: 1px solid var(--amber-dim);
+            color: var(--amber-glow);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.15s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--amber-glow);
+            opacity: 0;
+            transition: opacity 0.15s ease;
         }
 
         button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+            background: rgba(255, 176, 0, 0.1);
+            box-shadow: 0 0 20px rgba(255, 176, 0, 0.2);
+        }
+
+        button:active {
+            transform: scale(0.98);
         }
 
         button:disabled {
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: not-allowed;
-            transform: none;
         }
 
-        button.secondary {
-            background: var(--bg-input);
-            border: 1px solid var(--border-color);
+        button.primary {
+            background: var(--amber-glow);
+            color: var(--obsidian);
+            font-weight: 600;
         }
 
-        /* Tabs */
+        button.primary:hover {
+            background: var(--amber-bright);
+        }
+
+        button.small {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.7rem;
+        }
+
+        .validation-result {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+        }
+
+        /* ===== TABS ===== */
         .tabs {
             display: flex;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.5rem;
+            gap: 0;
+            margin-bottom: 0;
+            border-bottom: 1px solid var(--shale);
         }
 
         .tab {
-            padding: 0.75rem 1.5rem;
+            padding: 1rem 1.5rem;
             background: transparent;
             border: none;
-            color: var(--text-secondary);
-            font-size: 1rem;
+            border-bottom: 2px solid transparent;
+            color: var(--amber-dim);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
             cursor: pointer;
-            border-radius: 8px 8px 0 0;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
+            position: relative;
         }
 
         .tab:hover {
-            color: var(--text-primary);
-            background: var(--bg-input);
-            transform: none;
+            color: var(--amber-text);
+            background: rgba(255, 176, 0, 0.03);
             box-shadow: none;
+            transform: none;
         }
 
         .tab.active {
-            color: var(--accent-primary);
-            background: var(--bg-card);
-            border-bottom: 2px solid var(--accent-primary);
+            color: var(--amber-glow);
+            border-bottom-color: var(--amber-glow);
+            background: rgba(255, 176, 0, 0.05);
         }
 
-        /* Test Panels */
+        .tab-icon {
+            margin-right: 0.5rem;
+            font-size: 1rem;
+        }
+
+        /* ===== TEST PANELS ===== */
         .test-panel {
             display: none;
-            background: var(--bg-card);
-            border-radius: 12px;
+            background: var(--basalt);
+            border: 1px solid var(--shale);
+            border-top: none;
             padding: 2rem;
-            border: 1px solid var(--border-color);
         }
 
         .test-panel.active {
             display: block;
+            animation: fadeIn 0.3s ease;
         }
 
-        .test-panel h3 {
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .test-panel .description {
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
+        .panel-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--shale);
         }
 
-        /* Form Groups */
+        .panel-header h3 {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 400;
+            font-style: italic;
+            color: var(--amber-glow);
+        }
+
+        .panel-header p {
+            font-size: 0.8rem;
+            color: var(--amber-dim);
+            margin-top: 0.25rem;
+        }
+
+        .model-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(0, 168, 255, 0.1);
+            border: 1px solid var(--azurite);
+            font-size: 0.7rem;
+            color: var(--azurite);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .model-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--azurite);
+            border-radius: 50%;
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Form elements */
         .form-group {
             margin-bottom: 1.5rem;
         }
@@ -206,370 +412,566 @@
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
-            color: var(--text-secondary);
-            font-weight: 500;
+            font-size: 0.7rem;
+            color: var(--amber-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
         }
 
         textarea {
             width: 100%;
-            min-height: 120px;
+            min-height: 140px;
             resize: vertical;
-            font-family: 'Fira Code', 'Monaco', monospace;
-            font-size: 0.9rem;
+            line-height: 1.5;
         }
 
         .form-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 1rem;
         }
 
-        /* Code Block */
-        .code-block {
-            background: #0d0d14;
-            border-radius: 8px;
-            padding: 1rem;
-            margin: 1rem 0;
-            overflow-x: auto;
-            font-family: 'Fira Code', 'Monaco', monospace;
-            font-size: 0.85rem;
-            border: 1px solid var(--border-color);
+        select {
+            width: 100%;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23cc8800' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
         }
 
-        .code-block pre {
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-
-        /* Results Section */
-        .results-section {
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .results-section h4 {
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .result-status {
+        /* Cost display */
+        .cost-display {
             display: inline-flex;
             align-items: center;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.875rem;
+            gap: 0.75rem;
+            padding: 0.75rem 1.25rem;
+            background: rgba(0, 217, 160, 0.08);
+            border: 1px solid var(--malachite);
+            margin-bottom: 1.5rem;
+        }
+
+        .cost-display .label {
+            font-size: 0.65rem;
+            color: var(--malachite);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .cost-display .value {
+            font-size: 1.1rem;
+            color: var(--malachite);
+            font-weight: 600;
+        }
+
+        /* Results section */
+        .results-section {
+            margin-top: 2.5rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--shale);
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .result-header h4 {
+            font-size: 0.7rem;
+            color: var(--amber-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
             font-weight: 500;
         }
 
-        .result-status.success {
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--accent-success);
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border: 1px solid;
         }
 
-        .result-status.error {
-            background: rgba(239, 68, 68, 0.2);
-            color: var(--accent-error);
+        .status-badge.success {
+            color: var(--success);
+            border-color: var(--success);
+            background: rgba(0, 217, 160, 0.1);
         }
 
-        .result-status.pending {
-            background: rgba(245, 158, 11, 0.2);
-            color: var(--accent-warning);
+        .status-badge.error {
+            color: var(--error);
+            border-color: var(--error);
+            background: rgba(255, 68, 68, 0.1);
         }
 
-        /* Media Preview */
+        .status-badge.pending {
+            color: var(--warning);
+            border-color: var(--warning);
+            background: rgba(232, 232, 0, 0.1);
+        }
+
+        .status-badge::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        /* Code blocks */
+        .code-block {
+            background: var(--obsidian);
+            border: 1px solid var(--shale);
+            padding: 0;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .code-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--amber-dim);
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--shale);
+            background: rgba(255, 176, 0, 0.03);
+        }
+
+        .code-header h5 {
+            font-size: 0.7rem;
+            color: var(--amber-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 500;
+        }
+
+        .code-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .code-actions button {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.65rem;
+            background: transparent;
+            border: 1px solid var(--shale);
+            color: var(--amber-dim);
+        }
+
+        .code-actions button:hover {
+            border-color: var(--amber-dim);
+            color: var(--amber-glow);
+        }
+
+        .code-content {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .code-content.collapsed {
+            max-height: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .code-block pre {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--amber-text);
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Scrollbar styling */
+        .code-content::-webkit-scrollbar,
+        .logs::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .code-content::-webkit-scrollbar-track,
+        .logs::-webkit-scrollbar-track {
+            background: var(--obsidian);
+        }
+
+        .code-content::-webkit-scrollbar-thumb,
+        .logs::-webkit-scrollbar-thumb {
+            background: var(--shale);
+            border-radius: 4px;
+        }
+
+        .code-content::-webkit-scrollbar-thumb:hover,
+        .logs::-webkit-scrollbar-thumb:hover {
+            background: var(--amber-dim);
+        }
+
+        /* Media preview */
         .media-preview {
-            max-width: 100%;
-            border-radius: 8px;
-            margin-top: 1rem;
-            border: 1px solid var(--border-color);
+            margin-top: 1.5rem;
+            border: 1px solid var(--shale);
+            background: var(--obsidian);
+            padding: 1rem;
+        }
+
+        .media-preview:empty {
+            display: none;
         }
 
         .media-preview img,
         .media-preview video {
             max-width: 100%;
-            border-radius: 8px;
+            display: block;
         }
 
-        /* Progress Bar */
+        /* Progress bar */
+        .progress-container {
+            margin: 1rem 0;
+        }
+
         .progress-bar {
             width: 100%;
-            height: 8px;
-            background: var(--bg-input);
-            border-radius: 4px;
+            height: 4px;
+            background: var(--shale);
             overflow: hidden;
-            margin: 1rem 0;
         }
 
         .progress-bar .fill {
             height: 100%;
-            background: var(--gradient-primary);
-            border-radius: 4px;
+            background: linear-gradient(90deg, var(--amber-dim), var(--amber-glow));
             transition: width 0.3s ease;
+            box-shadow: 0 0 10px var(--amber-glow);
         }
 
-        /* Cost Estimate */
-        .cost-estimate {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.5rem 1rem;
-            background: rgba(6, 182, 212, 0.1);
-            border: 1px solid var(--accent-secondary);
-            border-radius: 8px;
-            color: var(--accent-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
+        .progress-text {
+            font-size: 0.75rem;
+            color: var(--amber-dim);
+            margin-top: 0.5rem;
         }
 
-        /* Troubleshooting Section */
-        .troubleshooting {
-            margin-top: 3rem;
-            padding-top: 2rem;
-            border-top: 1px solid var(--border-color);
+        /* Logs */
+        .logs {
+            background: var(--obsidian);
+            border: 1px solid var(--shale);
+            padding: 1rem;
+            max-height: 250px;
+            overflow-y: auto;
+            font-size: 0.8rem;
         }
 
-        .troubleshooting h3 {
-            margin-bottom: 1rem;
+        .log-entry {
+            padding: 0.3rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
             display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
         }
 
-        .troubleshooting h3::before {
-            content: '🔧';
+        .log-entry:last-child {
+            border-bottom: none;
         }
 
+        .log-timestamp {
+            color: rgba(255, 228, 160, 0.4);
+            flex-shrink: 0;
+        }
+
+        .log-entry.info { color: var(--amber-text); }
+        .log-entry.success { color: var(--success); }
+        .log-entry.error { color: var(--error); }
+        .log-entry.warning { color: var(--warning); }
+
+        /* ===== TROUBLESHOOTING TABLE ===== */
         .error-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 1rem;
+            font-size: 0.85rem;
         }
 
         .error-table th,
         .error-table td {
             padding: 0.75rem 1rem;
             text-align: left;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--shale);
         }
 
         .error-table th {
-            background: var(--bg-input);
-            color: var(--text-secondary);
-            font-weight: 600;
+            background: var(--slate);
+            color: var(--amber-dim);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 500;
+        }
+
+        .error-table td {
+            color: var(--amber-text);
         }
 
         .error-code {
-            font-family: monospace;
-            background: var(--bg-input);
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            background: var(--obsidian);
+            border: 1px solid var(--shale);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--cinnabar);
         }
 
-        /* Loading Spinner */
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-style: italic;
+            color: var(--amber-glow);
+            margin: 2.5rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--shale);
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            margin-top: 3rem;
+            padding: 2rem 0;
+            border-top: 1px solid var(--shale);
+            text-align: center;
+        }
+
+        .footer p {
+            font-size: 0.8rem;
+            color: var(--amber-dim);
+        }
+
+        .footer a {
+            color: var(--azurite);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer a:hover {
+            color: var(--amber-glow);
+        }
+
+        /* Spinner */
         .spinner {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--text-muted);
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--amber-dim);
             border-radius: 50%;
-            border-top-color: var(--accent-primary);
-            animation: spin 1s linear infinite;
+            border-top-color: var(--amber-glow);
+            animation: spin 0.8s linear infinite;
             margin-right: 0.5rem;
+            vertical-align: middle;
         }
 
         @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+            to { transform: rotate(360deg); }
         }
 
-        /* Logs */
-        .logs {
-            background: #0d0d14;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-top: 1rem;
-            max-height: 300px;
-            overflow-y: auto;
-            font-family: 'Fira Code', 'Monaco', monospace;
-            font-size: 0.85rem;
-        }
-
-        .log-entry {
-            padding: 0.25rem 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .log-entry.info {
-            color: var(--text-secondary);
-        }
-
-        .log-entry.success {
-            color: var(--accent-success);
-        }
-
-        .log-entry.error {
-            color: var(--accent-error);
-        }
-
-        .log-entry.warning {
-            color: var(--accent-warning);
-        }
-
-        .log-timestamp {
-            color: var(--text-muted);
-            margin-right: 0.5rem;
-        }
-
-        /* Model Info */
-        .model-info {
-            background: rgba(124, 58, 237, 0.1);
-            border: 1px solid var(--accent-primary);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .model-info h4 {
-            color: var(--accent-primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .model-info p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        /* Hidden */
+        /* Hidden utility */
         .hidden {
             display: none !important;
         }
+
+        /* Token usage display */
+        .token-usage {
+            background: var(--obsidian);
+            border: 1px solid var(--shale);
+            padding: 1rem;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .token-usage .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.3rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .token-usage .row:last-child {
+            border-bottom: none;
+            padding-top: 0.5rem;
+            margin-top: 0.3rem;
+            border-top: 1px solid var(--shale);
+            font-weight: 600;
+            color: var(--malachite);
+        }
+
+        .token-usage .label {
+            color: var(--amber-dim);
+        }
+
+        .token-usage .value {
+            color: var(--amber-text);
+        }
     </style>
 </head>
-
 <body>
+    <div class="noise-overlay"></div>
+    
     <div class="container">
         <header>
-            <h1>🦖 Deep Time AI API Tester</h1>
-            <p class="subtitle">Test Gemini & Veo APIs — 1:1 match with app flow</p>
+            <div class="logo-mark">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                </svg>
+            </div>
+            <h1>Deep Time Laboratory</h1>
+            <p class="subtitle">Gemini & Veo API Testing Console</p>
+            <div class="header-line"></div>
         </header>
 
         <!-- API Key Section -->
         <section class="api-key-section">
-            <h2>API Configuration</h2>
-            <div class="input-group">
-                <input type="password" id="apiKey" placeholder="Enter your Gemini API Key (AIza...)" />
-                <button onclick="toggleApiKey()" class="secondary" id="toggleKeyBtn">Show</button>
-                <button onclick="validateApiKey()">Validate Key</button>
+            <div class="input-row">
+                <input type="password" id="apiKey" placeholder="Enter Gemini API Key (AIza...)" />
+                <button onclick="toggleApiKey()" class="small" id="toggleKeyBtn">Show</button>
+                <button onclick="validateApiKey()" class="primary">Validate</button>
             </div>
-            <div id="keyValidationResult" style="margin-top: 1rem;"></div>
+            <div class="validation-result" id="keyValidationResult"></div>
         </section>
 
         <!-- Tabs -->
         <div class="tabs">
-            <button class="tab active" onclick="showTab('image')">🖼️ Image Generation</button>
-            <button class="tab" onclick="showTab('video')">🎬 Video Generation</button>
-            <button class="tab" onclick="showTab('text')">📝 Text Generation</button>
-            <button class="tab" onclick="showTab('troubleshoot')">🔧 Troubleshooting</button>
+            <button class="tab active" onclick="showTab('image')">
+                <span class="tab-icon">◈</span>Image
+            </button>
+            <button class="tab" onclick="showTab('video')">
+                <span class="tab-icon">▶</span>Video
+            </button>
+            <button class="tab" onclick="showTab('text')">
+                <span class="tab-icon">¶</span>Text
+            </button>
+            <button class="tab" onclick="showTab('troubleshoot')">
+                <span class="tab-icon">⚙</span>Diagnostics
+            </button>
         </div>
 
         <!-- Image Generation Panel -->
         <div id="image-panel" class="test-panel active">
-            <h3>🖼️ Image Generation Test</h3>
-            <p class="description">Test Gemini 2.5 Flash Image API — Same as <code>imageGenerator.ts</code></p>
+            <div class="panel-header">
+                <div>
+                    <h3>Image Generation</h3>
+                    <p>Gemini image models — Native image synthesis</p>
+                </div>
+                <div class="model-badge" id="imageModelBadge">gemini-2.5-flash-image</div>
+            </div>
 
-            <div class="model-info">
-                <h4>Model: gemini-2.5-flash-image</h4>
-                <p>Native image generation with contextual understanding. Pricing: $0.039 per image</p>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Model</label>
+                    <select id="imageModel" onchange="updateImageModelInfo()">
+                        <option value="gemini-2.5-flash-image">Gemini 2.5 Flash Image</option>
+                        <option value="gemini-3-pro-image-preview">Gemini 3 Pro Image Preview</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Aspect Ratio</label>
+                    <select id="imageAspectRatio">
+                        <option value="16:9">16:9 Landscape</option>
+                        <option value="9:16">9:16 Portrait</option>
+                        <option value="1:1">1:1 Square</option>
+                        <option value="4:3">4:3 Standard</option>
+                    </select>
+                </div>
             </div>
 
             <div class="form-group">
-                <label>Image Prompt (same format as app)</label>
-                <textarea id="imagePrompt" placeholder="Generate a photorealistic landscape image showing...">Generate a photorealistic landscape image showing: A prehistoric scene at Test Location during the Jurassic period, 150 million years ago. The landscape features lush forests with towering conifers and ferns. Dinosaurs roam the terrain. Climate: warm and humid.
+                <label>Generation Prompt</label>
+                <textarea id="imagePrompt">Generate a photorealistic landscape image showing: A prehistoric scene at Test Location during the Jurassic period, 150 million years ago. The landscape features lush forests with towering conifers and ferns. Dinosaurs roam the terrain. Climate: warm and humid.
 
 Style: Photorealistic nature photography, cinematic lighting, high detail.
 Aspect ratio: 16:9 (landscape orientation).
 Do not include any text, labels, or watermarks in the image.</textarea>
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Aspect Ratio</label>
-                    <select id="imageAspectRatio">
-                        <option value="16:9">16:9 (Landscape)</option>
-                        <option value="9:16">9:16 (Portrait)</option>
-                        <option value="1:1">1:1 (Square)</option>
-                        <option value="4:3">4:3</option>
-                    </select>
-                </div>
+            <div class="cost-display" id="imageCostDisplay">
+                <span class="label">Cost per Image</span>
+                <span class="value" id="imagePricing">$0.039</span>
             </div>
 
-            <div class="cost-estimate">
-                💰 Estimated Cost: $0.039 per image
-            </div>
-
-            <button onclick="testImageGeneration()" id="imageTestBtn">
-                🚀 Generate Image (REAL API CALL)
+            <button onclick="testImageGeneration()" id="imageTestBtn" class="primary">
+                Execute Generation
             </button>
 
             <div class="results-section" id="imageResults">
-                <h4>Request Details</h4>
+                <div class="result-header">
+                    <h4>Request Payload</h4>
+                </div>
                 <div class="code-block" id="imageRequest">
-                    <pre>// Request will appear here...</pre>
+                    <pre>// Awaiting execution...</pre>
                 </div>
 
-                <h4>Response <span class="result-status" id="imageStatus"></span></h4>
+                <div class="result-header">
+                    <h4>Response</h4>
+                    <span class="status-badge hidden" id="imageStatus"></span>
+                </div>
                 <div class="code-block" id="imageResponse">
-                    <pre>// Response will appear here...</pre>
+                    <pre>// Awaiting response...</pre>
                 </div>
 
                 <div class="media-preview" id="imagePreview"></div>
 
-                <h4>Logs</h4>
+                <div class="result-header">
+                    <h4>Execution Log</h4>
+                </div>
                 <div class="logs" id="imageLogs"></div>
             </div>
         </div>
 
         <!-- Video Generation Panel -->
         <div id="video-panel" class="test-panel">
-            <h3>🎬 Video Generation Test</h3>
-            <p class="description">Test Veo 3.1 Fast API — Same as <code>videoGenerator.ts</code></p>
-
-            <div class="model-info">
-                <h4>Model: veo-3.1-fast-generate-preview</h4>
-                <p>Fast video generation with audio. Pricing: $0.15 per second of video</p>
-            </div>
-
-            <div class="form-group">
-                <label>Video Prompt (same format as app)</label>
-                <textarea id="videoPrompt" placeholder="A prehistoric scene...">A cinematic video of prehistoric Earth at Test Location during the Jurassic period. 
-
-The scene begins with a sweeping view of the ancient landscape featuring lush vegetation with cycads, ferns, and tall conifers. A Brachiosaurus slowly walks through the scene, its long neck reaching for tree tops. Pterosaurs fly overhead. 
-
-Natural movement, documentary style cinematography, golden hour lighting, slight camera movement.
-
-Location: California, USA
-Time Period: 150 million years ago</textarea>
+            <div class="panel-header">
+                <div>
+                    <h3>Video Generation</h3>
+                    <p>Veo 3.1 — Cinematic video synthesis with audio</p>
+                </div>
+                <div class="model-badge" id="videoModelBadge">veo-3.1-fast-generate-preview</div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>Duration (seconds)</label>
-                    <select id="videoDuration">
-                        <option value="4">4 seconds ($0.60)</option>
-                        <option value="5">5 seconds ($0.75)</option>
-                        <option value="6" selected>6 seconds ($0.90)</option>
-                        <option value="8">8 seconds ($1.20)</option>
+                    <label>Model</label>
+                    <select id="videoModel" onchange="updateVideoModelInfo()">
+                        <option value="veo-3.1-fast-generate-preview">Veo 3.1 Fast</option>
+                        <option value="veo-3.1-generate-preview">Veo 3.1 Standard</option>
                     </select>
                 </div>
                 <div class="form-group">
+                    <label>Duration</label>
+                    <select id="videoDuration" onchange="updateVideoCost()">
+                        <option value="4">4 seconds</option>
+                        <option value="5">5 seconds</option>
+                        <option value="6" selected>6 seconds</option>
+                        <option value="8">8 seconds</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
                     <label>Aspect Ratio</label>
                     <select id="videoAspectRatio">
-                        <option value="9:16" selected>9:16 (Portrait - App Default)</option>
-                        <option value="16:9">16:9 (Landscape)</option>
-                        <option value="1:1">1:1 (Square)</option>
+                        <option value="9:16" selected>9:16 Portrait</option>
+                        <option value="16:9">16:9 Landscape</option>
+                        <option value="1:1">1:1 Square</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -581,62 +983,135 @@ Time Period: 150 million years ago</textarea>
                 </div>
             </div>
 
-            <div class="cost-estimate" id="videoCostEstimate">
-                💰 Estimated Cost: $0.90 (6 seconds × $0.15/sec)
+            <div class="form-group">
+                <label>Video Prompt</label>
+                <textarea id="videoPrompt">A cinematic video of prehistoric Earth at Test Location during the Jurassic period. 
+
+The scene begins with a sweeping view of the ancient landscape featuring lush vegetation with cycads, ferns, and tall conifers. A Brachiosaurus slowly walks through the scene, its long neck reaching for tree tops. Pterosaurs fly overhead. 
+
+Natural movement, documentary style cinematography, golden hour lighting, slight camera movement.
+
+Location: California, USA
+Time Period: 150 million years ago</textarea>
             </div>
 
-            <button onclick="testVideoGeneration()" id="videoTestBtn">
-                🚀 Generate Video (REAL API CALL)
+            <div class="cost-display" id="videoCostEstimate">
+                <span class="label">Est. Cost</span>
+                <span class="value" id="videoPricing">$0.90</span>
+            </div>
+
+            <button onclick="testVideoGeneration()" id="videoTestBtn" class="primary">
+                Execute Generation
             </button>
 
             <div class="results-section" id="videoResults">
-                <h4>Step 1: Start Generation Request</h4>
+                <div class="result-header">
+                    <h4>Request Payload</h4>
+                </div>
                 <div class="code-block" id="videoRequest">
-                    <pre>// Request will appear here...</pre>
+                    <pre>// Awaiting execution...</pre>
                 </div>
 
-                <h4>Step 2: Operation Status</h4>
-                <div id="videoOperationInfo">
-                    <div class="progress-bar hidden" id="videoProgress">
+                <div class="result-header">
+                    <h4>Operation Status</h4>
+                    <span class="status-badge hidden" id="videoStatus"></span>
+                </div>
+                <div class="progress-container hidden" id="videoProgressContainer">
+                    <div class="progress-bar" id="videoProgress">
                         <div class="fill" style="width: 0%"></div>
                     </div>
-                    <p id="videoOperationStatus">Not started</p>
+                    <p class="progress-text" id="videoOperationStatus">Initializing...</p>
                 </div>
 
-                <h4>Step 3: Response <span class="result-status" id="videoStatus"></span></h4>
+                <div class="result-header">
+                    <h4>Response</h4>
+                </div>
                 <div class="code-block" id="videoResponse">
-                    <pre>// Response will appear here...</pre>
+                    <pre>// Awaiting response...</pre>
                 </div>
 
                 <div class="media-preview" id="videoPreview"></div>
 
-                <h4>Logs</h4>
+                <div class="result-header">
+                    <h4>Execution Log</h4>
+                </div>
                 <div class="logs" id="videoLogs"></div>
             </div>
         </div>
 
         <!-- Text Generation Panel -->
         <div id="text-panel" class="test-panel">
-            <h3>📝 Text Generation Test</h3>
-            <p class="description">Test Gemini 2.5 Flash for narrative generation — Same as
-                <code>textGenerator.ts</code>
-            </p>
+            <div class="panel-header">
+                <div>
+                    <h3>Text Generation</h3>
+                    <p>Gemini models — Narrative synthesis</p>
+                </div>
+                <div class="model-badge" id="textModelBadge">gemini-2.5-flash</div>
+            </div>
 
-            <div class="model-info">
-                <h4>Model: gemini-2.5-flash</h4>
-                <p>Balanced performance for detailed content. Pricing: $0.30/1M input, $2.50/1M output</p>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Model</label>
+                    <select id="textModel" onchange="updateTextModelInfo()">
+                        <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                        <option value="gemini-2.5-flash-preview-09-2025">Gemini 2.5 Flash Preview</option>
+                        <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite</option>
+                        <option value="gemini-3-pro-preview">Gemini 3 Pro Preview</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Temperature</label>
+                    <select id="textTemperature">
+                        <option value="0.0">0.0 (Deterministic)</option>
+                        <option value="0.3">0.3 (Focused)</option>
+                        <option value="0.7" selected>0.7 (Balanced)</option>
+                        <option value="1.0">1.0 (Creative)</option>
+                        <option value="1.5">1.5 (Very Creative)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Max Output Tokens</label>
+                    <select id="textMaxTokens">
+                        <option value="512">512</option>
+                        <option value="1024">1024</option>
+                        <option value="2048" selected>2048</option>
+                        <option value="4096">4096</option>
+                        <option value="8192">8192</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row" id="textThinkingRow">
+                <div class="form-group">
+                    <label>Thinking Budget (tokens)</label>
+                    <select id="textThinkingBudget">
+                        <option value="0" selected>Disabled</option>
+                        <option value="1024">1024</option>
+                        <option value="2048">2048</option>
+                        <option value="4096">4096</option>
+                        <option value="8192">8192</option>
+                        <option value="16384">16384</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label style="opacity: 0.6;">Thinking Mode</label>
+                    <select disabled style="opacity: 0.6;">
+                        <option>Auto (model decides)</option>
+                    </select>
+                </div>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--amber-dim); margin-top: -0.5rem; margin-bottom: 1rem;">
+                ⚠️ Note: Thinking tokens count toward max output tokens. If thinking budget is too high, the model may not generate text output.
             </div>
 
             <div class="form-group">
-                <label>System Prompt</label>
-                <textarea id="textSystemPrompt"
-                    style="min-height: 80px;">You are an expert paleontologist and science communicator. Generate engaging narratives about prehistoric Earth for a mobile AR application called "Deep Time". Be accurate, vivid, and educational.</textarea>
+                <label>System Instructions</label>
+                <textarea id="textSystemPrompt" style="min-height: 80px;">You are an expert paleontologist and science communicator. Generate engaging narratives about prehistoric Earth for a mobile AR application called "Deep Time". Be accurate, vivid, and educational.</textarea>
             </div>
 
             <div class="form-group">
-                <label>User Prompt (narrative request)</label>
-                <textarea
-                    id="textPrompt">Generate a detailed narrative about this location during the Jurassic period (150 million years ago).
+                <label>User Prompt</label>
+                <textarea id="textPrompt">Generate a detailed narrative about this location during the Jurassic period (150 million years ago).
 
 Location: San Francisco, California, USA
 Coordinates: 37.7749, -122.4194
@@ -650,107 +1125,156 @@ Include:
 Format as a JSON object with: flora (array), fauna (array), climate (object with temperature, humidity, atmosphere), geologicalFeatures (array), and a narrative summary.</textarea>
             </div>
 
-            <div class="cost-estimate">
-                💰 Estimated Cost: ~$0.001 per request (varies by token count)
+            <div class="cost-display" id="textCostDisplay">
+                <span class="label">Pricing</span>
+                <span class="value" id="textPricing">$0.30/1M in · $2.50/1M out</span>
             </div>
 
-            <button onclick="testTextGeneration()" id="textTestBtn">
-                🚀 Generate Text (REAL API CALL)
+            <button onclick="testTextGeneration()" id="textTestBtn" class="primary">
+                Execute Generation
             </button>
 
             <div class="results-section" id="textResults">
-                <h4>Request Details</h4>
+                <div class="result-header">
+                    <h4>Request Payload</h4>
+                </div>
                 <div class="code-block" id="textRequest">
-                    <pre>// Request will appear here...</pre>
+                    <pre>// Awaiting execution...</pre>
                 </div>
 
-                <h4>Response <span class="result-status" id="textStatus"></span></h4>
+                <div class="result-header">
+                    <h4>Generated Text</h4>
+                    <span class="status-badge hidden" id="textStatus"></span>
+                </div>
+                <div class="code-block hidden" id="textPreview">
+                    <div class="code-header">
+                        <h5>Text Output</h5>
+                        <div class="code-actions">
+                            <button onclick="copyCode('textPreview')">Copy</button>
+                        </div>
+                    </div>
+                    <div class="code-content" style="max-height: 300px;">
+                        <pre id="textPreview-pre" style="white-space: pre-wrap;"></pre>
+                    </div>
+                </div>
+
+                <div class="result-header" style="margin-top: 1.5rem;">
+                    <h4>Full Response JSON</h4>
+                </div>
                 <div class="code-block" id="textResponse">
-                    <pre>// Response will appear here...</pre>
+                    <pre>// Awaiting response...</pre>
                 </div>
 
-                <h4>Token Usage</h4>
-                <div id="tokenUsage" style="color: var(--text-secondary);"></div>
+                <div class="token-usage hidden" id="tokenUsage">
+                    <div class="row">
+                        <span class="label">Input Tokens</span>
+                        <span class="value" id="inputTokens">—</span>
+                    </div>
+                    <div class="row">
+                        <span class="label">Output Tokens</span>
+                        <span class="value" id="outputTokens">—</span>
+                    </div>
+                    <div class="row">
+                        <span class="label">Cached Tokens</span>
+                        <span class="value" id="cachedTokens">—</span>
+                    </div>
+                    <div class="row">
+                        <span class="label">Total Cost</span>
+                        <span class="value" id="totalCost">—</span>
+                    </div>
+                </div>
 
-                <h4>Logs</h4>
+                <div class="result-header" style="margin-top: 1.5rem;">
+                    <h4>Execution Log</h4>
+                </div>
                 <div class="logs" id="textLogs"></div>
             </div>
         </div>
 
         <!-- Troubleshooting Panel -->
         <div id="troubleshoot-panel" class="test-panel">
-            <h3>🔧 Troubleshooting Guide</h3>
-            <p class="description">Common API errors and solutions (from Gemini API documentation)</p>
+            <div class="panel-header">
+                <div>
+                    <h3>Diagnostics & Troubleshooting</h3>
+                    <p>API error reference and system diagnostics</p>
+                </div>
+            </div>
 
+            <button onclick="runDiagnostics()" class="primary" style="margin-bottom: 1.5rem;">
+                Run System Diagnostics
+            </button>
+            <div class="logs" id="diagnosticsLogs" style="min-height: 100px;"></div>
+
+            <h4 class="section-title">Error Reference</h4>
             <table class="error-table">
                 <thead>
                     <tr>
-                        <th>HTTP Code</th>
+                        <th>Code</th>
                         <th>Status</th>
                         <th>Description</th>
-                        <th>Solution</th>
+                        <th>Resolution</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td><span class="error-code">400</span></td>
                         <td>INVALID_ARGUMENT</td>
-                        <td>Request body is malformed</td>
-                        <td>Check API reference for request format. Verify all required fields are present.</td>
+                        <td>Malformed request body</td>
+                        <td>Verify request format against API spec</td>
                     </tr>
                     <tr>
                         <td><span class="error-code">400</span></td>
                         <td>FAILED_PRECONDITION</td>
-                        <td>Free tier not available in your country</td>
+                        <td>Free tier unavailable in region</td>
                         <td>Enable billing in Google AI Studio</td>
                     </tr>
                     <tr>
                         <td><span class="error-code">403</span></td>
                         <td>PERMISSION_DENIED</td>
-                        <td>API key doesn't have required permissions</td>
-                        <td>Check API key is correct and has proper access</td>
+                        <td>Insufficient API key permissions</td>
+                        <td>Verify API key access level</td>
                     </tr>
                     <tr>
                         <td><span class="error-code">404</span></td>
                         <td>NOT_FOUND</td>
                         <td>Resource not found</td>
-                        <td>Verify model name and API version are correct</td>
+                        <td>Check model name and API version</td>
                     </tr>
                     <tr>
                         <td><span class="error-code">429</span></td>
                         <td>RESOURCE_EXHAUSTED</td>
                         <td>Rate limit exceeded</td>
-                        <td>Check rate limits. Request quota increase if needed. Wait and retry.</td>
+                        <td>Wait and retry, or request quota increase</td>
                     </tr>
                     <tr>
                         <td><span class="error-code">500</span></td>
                         <td>INTERNAL</td>
-                        <td>Unexpected error on Google's side</td>
-                        <td>Reduce input context or switch models temporarily. Wait and retry.</td>
+                        <td>Server-side error</td>
+                        <td>Reduce context size or retry later</td>
                     </tr>
                     <tr>
                         <td><span class="error-code">503</span></td>
                         <td>UNAVAILABLE</td>
-                        <td>Service temporarily overloaded</td>
-                        <td>Switch models temporarily or wait and retry.</td>
+                        <td>Service overloaded</td>
+                        <td>Switch models or retry later</td>
                     </tr>
                     <tr>
                         <td><span class="error-code">504</span></td>
                         <td>DEADLINE_EXCEEDED</td>
                         <td>Processing timeout</td>
-                        <td>Reduce prompt size or set a larger timeout.</td>
+                        <td>Reduce prompt size</td>
                     </tr>
                 </tbody>
             </table>
 
-            <h3 style="margin-top: 2rem;">Rate Limits (Free Tier)</h3>
+            <h4 class="section-title">Rate Limits (Free Tier)</h4>
             <table class="error-table">
                 <thead>
                     <tr>
                         <th>Model</th>
-                        <th>RPM (Requests/Min)</th>
-                        <th>RPD (Requests/Day)</th>
-                        <th>TPM (Tokens/Min)</th>
+                        <th>RPM</th>
+                        <th>RPD</th>
+                        <th>TPM</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -764,55 +1288,172 @@ Format as a JSON object with: flora (array), fauna (array), climate (object with
                         <td>gemini-2.5-flash-image</td>
                         <td>10</td>
                         <td>1,500</td>
-                        <td>N/A</td>
+                        <td>—</td>
                     </tr>
                     <tr>
                         <td>veo-3.1-fast</td>
                         <td>2</td>
                         <td>10</td>
-                        <td>N/A</td>
+                        <td>—</td>
                     </tr>
                 </tbody>
             </table>
-
-            <h3 style="margin-top: 2rem;">Quick Diagnostics</h3>
-            <button onclick="runDiagnostics()" style="margin-top: 1rem;">🔍 Run API Diagnostics</button>
-            <div class="logs" id="diagnosticsLogs" style="margin-top: 1rem;"></div>
         </div>
 
-        <!-- Troubleshooting Footer -->
-        <section class="troubleshooting">
-            <h3>Need More Help?</h3>
-            <p style="color: var(--text-secondary);">
-                Check the full troubleshooting guide at <a href="https://ai.google.dev/gemini-api/docs/troubleshooting"
-                    target="_blank"
-                    style="color: var(--accent-secondary);">ai.google.dev/gemini-api/docs/troubleshooting</a>
-                or join the <a href="https://discuss.ai.google.dev" target="_blank"
-                    style="color: var(--accent-secondary);">Google AI developer forum</a>.
+        <footer class="footer">
+            <p>
+                Deep Time Laboratory · 
+                <a href="https://ai.google.dev/gemini-api/docs/troubleshooting" target="_blank">API Documentation</a> · 
+                <a href="https://discuss.ai.google.dev" target="_blank">Developer Forum</a>
             </p>
-        </section>
+        </footer>
     </div>
+
 
     <script>
         // ============================================
-        // CONSTANTS - Same as app
+        // CONSTANTS
         // ============================================
         const GEMINI_API_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
 
-        const MODELS = {
-            IMAGE: 'gemini-2.5-flash-image',  // Image generation model
-            VIDEO: 'veo-3.1-fast-generate-preview',   // Video generation model
-            TEXT: 'gemini-2.5-flash'                   // Text generation model
+        const POLL_INTERVAL_MS = 10000;
+        const MAX_POLL_ATTEMPTS = 30;
+
+        // Model configurations with pricing
+        const TEXT_MODELS = {
+            'gemini-2.5-flash': {
+                name: 'Gemini 2.5 Flash',
+                inputPrice: 0.30,
+                outputPrice: 2.50,
+                supportsThinking: true,
+                description: 'Hybrid reasoning model with 1M context'
+            },
+            'gemini-2.5-flash-preview-09-2025': {
+                name: 'Gemini 2.5 Flash Preview',
+                inputPrice: 0.30,
+                outputPrice: 2.50,
+                supportsThinking: true,
+                description: 'Latest preview for agentic use cases'
+            },
+            'gemini-2.5-flash-lite': {
+                name: 'Gemini 2.5 Flash-Lite',
+                inputPrice: 0.10,
+                outputPrice: 0.40,
+                supportsThinking: true,
+                description: 'Most cost-effective model'
+            },
+            'gemini-3-pro-preview': {
+                name: 'Gemini 3 Pro Preview',
+                inputPrice: 2.00,
+                outputPrice: 12.00,
+                supportsThinking: true,
+                description: 'Best multimodal understanding'
+            }
         };
 
-        const POLL_INTERVAL_MS = 10000; // 10 seconds, same as app
-        const MAX_POLL_ATTEMPTS = 30;   // Same as app
+        const IMAGE_MODELS = {
+            'gemini-2.5-flash-image': {
+                name: 'Gemini 2.5 Flash Image',
+                pricePerImage: 0.039,
+                description: 'Fast, flexible image generation'
+            },
+            'gemini-3-pro-image-preview': {
+                name: 'Gemini 3 Pro Image Preview',
+                pricePerImage: 0.134,
+                description: 'Premium image generation'
+            }
+        };
+
+        const VIDEO_MODELS = {
+            'veo-3.1-fast-generate-preview': {
+                name: 'Veo 3.1 Fast',
+                pricePerSecond: 0.15,
+                description: 'Fast video with audio'
+            },
+            'veo-3.1-generate-preview': {
+                name: 'Veo 3.1 Standard',
+                pricePerSecond: 0.40,
+                description: 'High quality video with audio'
+            }
+        };
 
         // ============================================
         // UTILITY FUNCTIONS
         // ============================================
         function getApiKey() {
             return document.getElementById('apiKey').value.trim();
+        }
+
+        // Truncate long base64 strings in JSON for display
+        function truncateBase64(obj, maxLength = 100) {
+            if (typeof obj !== 'object' || obj === null) return obj;
+            
+            if (Array.isArray(obj)) {
+                return obj.map(item => truncateBase64(item, maxLength));
+            }
+            
+            const result = {};
+            for (const [key, value] of Object.entries(obj)) {
+                if (key === 'data' && typeof value === 'string' && value.length > maxLength) {
+                    result[key] = `${value.substring(0, maxLength)}... [${value.length} chars total]`;
+                } else if (typeof value === 'object') {
+                    result[key] = truncateBase64(value, maxLength);
+                } else {
+                    result[key] = value;
+                }
+            }
+            return result;
+        }
+
+        // Create collapsible code block
+        function createCodeBlock(id, title, content, collapsed = false) {
+            const truncated = truncateBase64(content);
+            const jsonStr = typeof truncated === 'string' ? truncated : JSON.stringify(truncated, null, 2);
+            
+            return `
+                <div class="code-header">
+                    <h5>${title}</h5>
+                    <div class="code-actions">
+                        <button onclick="toggleCodeBlock('${id}')" id="${id}-toggle">
+                            ${collapsed ? 'Expand' : 'Collapse'}
+                        </button>
+                        <button onclick="copyCode('${id}')">Copy</button>
+                    </div>
+                </div>
+                <div class="code-content ${collapsed ? 'collapsed' : ''}" id="${id}-content">
+                    <pre id="${id}-pre">${jsonStr}</pre>
+                </div>
+            `;
+        }
+
+        function toggleCodeBlock(id) {
+            const content = document.getElementById(`${id}-content`);
+            const toggle = document.getElementById(`${id}-toggle`);
+            
+            if (content.classList.contains('collapsed')) {
+                content.classList.remove('collapsed');
+                toggle.textContent = 'Collapse';
+            } else {
+                content.classList.add('collapsed');
+                toggle.textContent = 'Expand';
+            }
+        }
+
+        function copyCode(id) {
+            const pre = document.getElementById(`${id}-pre`);
+            const text = pre.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                // Visual feedback
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                btn.style.color = 'var(--success)';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.color = '';
+                }, 2000);
+            });
         }
 
         function toggleApiKey() {
@@ -828,14 +1469,14 @@ Format as a JSON object with: flora (array), fauna (array), climate (object with
         }
 
         function getTimestamp() {
-            return new Date().toLocaleTimeString();
+            return new Date().toLocaleTimeString('en-US', { hour12: false });
         }
 
         function addLog(logsId, message, type = 'info') {
             const logs = document.getElementById(logsId);
             const entry = document.createElement('div');
             entry.className = `log-entry ${type}`;
-            entry.innerHTML = `<span class="log-timestamp">[${getTimestamp()}]</span>${message}`;
+            entry.innerHTML = `<span class="log-timestamp">${getTimestamp()}</span><span>${message}</span>`;
             logs.appendChild(entry);
             logs.scrollTop = logs.scrollHeight;
         }
@@ -845,25 +1486,74 @@ Format as a JSON object with: flora (array), fauna (array), climate (object with
         }
 
         function showTab(tabName) {
-            // Hide all panels
-            document.querySelectorAll('.test-panel').forEach(panel => {
-                panel.classList.remove('active');
-            });
-            // Remove active from all tabs
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            // Show selected panel
+            document.querySelectorAll('.test-panel').forEach(panel => panel.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             document.getElementById(`${tabName}-panel`).classList.add('active');
-            // Set active tab
-            event.target.classList.add('active');
+            event.target.closest('.tab').classList.add('active');
         }
 
         function setStatus(elementId, status, text) {
             const el = document.getElementById(elementId);
-            el.className = `result-status ${status}`;
+            el.className = `status-badge ${status}`;
             el.textContent = text || status.toUpperCase();
+            el.classList.remove('hidden');
         }
+
+        function hideStatus(elementId) {
+            document.getElementById(elementId).classList.add('hidden');
+        }
+
+        // ============================================
+        // MODEL INFO UPDATES
+        // ============================================
+        function updateTextModelInfo() {
+            const modelId = document.getElementById('textModel').value;
+            const model = TEXT_MODELS[modelId];
+            
+            document.getElementById('textModelBadge').textContent = modelId;
+            document.getElementById('textPricing').textContent = 
+                `$${model.inputPrice.toFixed(2)}/1M in · $${model.outputPrice.toFixed(2)}/1M out`;
+            
+            // Show/hide thinking budget based on model support
+            const thinkingRow = document.getElementById('textThinkingRow');
+            if (model.supportsThinking) {
+                thinkingRow.style.display = 'grid';
+            } else {
+                thinkingRow.style.display = 'none';
+            }
+        }
+
+        function updateImageModelInfo() {
+            const modelId = document.getElementById('imageModel').value;
+            const model = IMAGE_MODELS[modelId];
+            
+            document.getElementById('imageModelBadge').textContent = modelId;
+            document.getElementById('imagePricing').textContent = `$${model.pricePerImage.toFixed(3)}`;
+        }
+
+        function updateVideoModelInfo() {
+            const modelId = document.getElementById('videoModel').value;
+            const model = VIDEO_MODELS[modelId];
+            
+            document.getElementById('videoModelBadge').textContent = modelId;
+            updateVideoCost();
+        }
+
+        function updateVideoCost() {
+            const modelId = document.getElementById('videoModel').value;
+            const model = VIDEO_MODELS[modelId];
+            const duration = parseInt(document.getElementById('videoDuration').value);
+            const cost = (duration * model.pricePerSecond).toFixed(2);
+            
+            document.getElementById('videoPricing').textContent = `$${cost}`;
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            updateTextModelInfo();
+            updateImageModelInfo();
+            updateVideoModelInfo();
+        });
 
         // ============================================
         // API KEY VALIDATION
@@ -873,91 +1563,85 @@ Format as a JSON object with: flora (array), fauna (array), climate (object with
             const resultEl = document.getElementById('keyValidationResult');
 
             if (!apiKey) {
-                resultEl.innerHTML = '<span style="color: var(--accent-error);">❌ Please enter an API key</span>';
+                resultEl.innerHTML = '<span style="color: var(--error);">✗ Please enter an API key</span>';
                 return;
             }
 
             resultEl.innerHTML = '<span class="spinner"></span> Validating...';
 
             try {
-                // Simple test: list models
                 const response = await fetch(`${GEMINI_API_BASE_URL}/models?key=${apiKey}`);
 
                 if (response.ok) {
                     const data = await response.json();
                     const modelCount = data.models?.length || 0;
-                    resultEl.innerHTML = `<span style="color: var(--accent-success);">✅ API Key Valid! Found ${modelCount} available models.</span>`;
+                    resultEl.innerHTML = `<span style="color: var(--success);">✓ Valid — ${modelCount} models available</span>`;
                 } else {
                     const error = await response.json();
-                    resultEl.innerHTML = `<span style="color: var(--accent-error);">❌ Invalid: ${error.error?.message || response.statusText}</span>`;
+                    resultEl.innerHTML = `<span style="color: var(--error);">✗ ${error.error?.message || response.statusText}</span>`;
                 }
             } catch (error) {
-                resultEl.innerHTML = `<span style="color: var(--accent-error);">❌ Network error: ${error.message}</span>`;
+                resultEl.innerHTML = `<span style="color: var(--error);">✗ Network error: ${error.message}</span>`;
             }
         }
 
         // ============================================
-        // IMAGE GENERATION - Same flow as imageGenerator.ts
+        // IMAGE GENERATION
         // ============================================
         async function testImageGeneration() {
             const apiKey = getApiKey();
             if (!apiKey) {
-                alert('Please enter your API key first!');
+                alert('Please enter your API key first');
                 return;
             }
 
+            const modelId = document.getElementById('imageModel').value;
+            const model = IMAGE_MODELS[modelId];
             const prompt = document.getElementById('imagePrompt').value;
-            const aspectRatio = document.getElementById('imageAspectRatio').value;
             const btn = document.getElementById('imageTestBtn');
 
             clearLogs('imageLogs');
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner"></span> Generating...';
-            setStatus('imageStatus', 'pending', 'GENERATING...');
+            setStatus('imageStatus', 'pending', 'PROCESSING');
             document.getElementById('imagePreview').innerHTML = '';
 
-            addLog('imageLogs', 'Starting image generation...', 'info');
-            addLog('imageLogs', `Model: ${MODELS.IMAGE}`, 'info');
-            addLog('imageLogs', `Aspect Ratio: ${aspectRatio}`, 'info');
+            addLog('imageLogs', 'Initializing image generation...', 'info');
+            addLog('imageLogs', `Model: ${modelId}`, 'info');
+            addLog('imageLogs', `Cost: $${model.pricePerImage.toFixed(3)} per image`, 'info');
 
-            // Build request body - EXACT same structure as imageGenerator.ts
             const requestBody = {
                 contents: [{
-                    parts: [{
-                        text: prompt
-                    }]
+                    parts: [{ text: prompt }]
                 }],
                 generationConfig: {
                     responseModalities: ['IMAGE', 'TEXT']
                 }
             };
 
-            document.getElementById('imageRequest').innerHTML = `<pre>${JSON.stringify(requestBody, null, 2)}</pre>`;
+            document.getElementById('imageRequest').innerHTML = createCodeBlock('imageReq', 'Request JSON', requestBody, false);
 
             try {
-                addLog('imageLogs', `POST ${GEMINI_API_BASE_URL}/models/${MODELS.IMAGE}:generateContent`, 'info');
+                addLog('imageLogs', `POST ${modelId}:generateContent`, 'info');
 
                 const response = await fetch(
-                    `${GEMINI_API_BASE_URL}/models/${MODELS.IMAGE}:generateContent?key=${apiKey}`,
+                    `${GEMINI_API_BASE_URL}/models/${modelId}:generateContent?key=${apiKey}`,
                     {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(requestBody),
                     }
                 );
 
                 const responseData = await response.json();
-                document.getElementById('imageResponse').innerHTML = `<pre>${JSON.stringify(responseData, null, 2)}</pre>`;
+                document.getElementById('imageResponse').innerHTML = createCodeBlock('imageRes', 'Response JSON', responseData, true);
 
                 if (!response.ok) {
                     throw new Error(`API Error ${response.status}: ${responseData.error?.message || 'Unknown error'}`);
                 }
 
-                addLog('imageLogs', `Response status: ${response.status}`, 'success');
+                addLog('imageLogs', `Response: ${response.status} OK`, 'success');
 
-                // Extract image from response - Same as imageGenerator.ts
                 let imageData = null;
                 const candidates = responseData.candidates;
                 if (candidates && candidates.length > 0) {
@@ -974,21 +1658,19 @@ Format as a JSON object with: flora (array), fauna (array), climate (object with
                 }
 
                 if (imageData) {
-                    setStatus('imageStatus', 'success', 'SUCCESS');
-                    addLog('imageLogs', `Image generated successfully! MimeType: ${imageData.mimeType}`, 'success');
-                    addLog('imageLogs', `Data size: ${(imageData.data.length * 0.75 / 1024).toFixed(2)} KB`, 'info');
+                    setStatus('imageStatus', 'success', 'COMPLETE');
+                    addLog('imageLogs', `Image generated: ${imageData.mimeType}`, 'success');
+                    addLog('imageLogs', `Size: ${(imageData.data.length * 0.75 / 1024).toFixed(2)} KB`, 'info');
 
-                    // Display image
                     const imgEl = document.createElement('img');
                     imgEl.src = `data:${imageData.mimeType};base64,${imageData.data}`;
                     document.getElementById('imagePreview').appendChild(imgEl);
                 } else {
-                    // Check for text response
                     const textPart = candidates?.[0]?.content?.parts?.find(p => p.text);
                     if (textPart) {
-                        addLog('imageLogs', `Model returned text instead of image: ${textPart.text.substring(0, 200)}...`, 'warning');
+                        addLog('imageLogs', `Text response: ${textPart.text.substring(0, 200)}...`, 'warning');
                     }
-                    throw new Error('No image was generated in the response');
+                    throw new Error('No image in response');
                 }
 
             } catch (error) {
@@ -996,39 +1678,42 @@ Format as a JSON object with: flora (array), fauna (array), climate (object with
                 addLog('imageLogs', `Error: ${error.message}`, 'error');
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '🚀 Generate Image (REAL API CALL)';
+                btn.innerHTML = 'Execute Generation';
             }
         }
 
         // ============================================
-        // VIDEO GENERATION - Same flow as videoGenerator.ts
+        // VIDEO GENERATION
         // ============================================
         async function testVideoGeneration() {
             const apiKey = getApiKey();
             if (!apiKey) {
-                alert('Please enter your API key first!');
+                alert('Please enter your API key first');
                 return;
             }
 
+            const modelId = document.getElementById('videoModel').value;
+            const model = VIDEO_MODELS[modelId];
             const prompt = document.getElementById('videoPrompt').value;
             const duration = parseInt(document.getElementById('videoDuration').value);
             const aspectRatio = document.getElementById('videoAspectRatio').value;
             const resolution = document.getElementById('videoResolution').value;
             const btn = document.getElementById('videoTestBtn');
 
+            const estimatedCost = (duration * model.pricePerSecond).toFixed(2);
+
             clearLogs('videoLogs');
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner"></span> Generating...';
-            setStatus('videoStatus', 'pending', 'STARTING...');
+            setStatus('videoStatus', 'pending', 'INITIALIZING');
             document.getElementById('videoPreview').innerHTML = '';
-            document.getElementById('videoProgress').classList.remove('hidden');
+            document.getElementById('videoProgressContainer').classList.remove('hidden');
 
-            addLog('videoLogs', 'Starting video generation...', 'info');
-            addLog('videoLogs', `Model: ${MODELS.VIDEO}`, 'info');
-            addLog('videoLogs', `Duration: ${duration}s, Aspect: ${aspectRatio}, Resolution: ${resolution}`, 'info');
-            addLog('videoLogs', `Estimated cost: $${(duration * 0.15).toFixed(2)}`, 'info');
+            addLog('videoLogs', 'Initializing video generation...', 'info');
+            addLog('videoLogs', `Model: ${modelId}`, 'info');
+            addLog('videoLogs', `Config: ${duration}s, ${aspectRatio}, ${resolution}`, 'info');
+            addLog('videoLogs', `Est. cost: $${estimatedCost}`, 'info');
 
-            // Build request body - EXACT same structure as videoGenerator.ts
             const requestBody = {
                 instances: [{
                     prompt: prompt,
@@ -1041,14 +1726,13 @@ Format as a JSON object with: flora (array), fauna (array), climate (object with
                 },
             };
 
-            document.getElementById('videoRequest').innerHTML = `<pre>${JSON.stringify(requestBody, null, 2)}</pre>`;
+            document.getElementById('videoRequest').innerHTML = createCodeBlock('videoReq', 'Request JSON', requestBody, false);
 
             try {
-                // Step 1: Start video generation (long-running operation)
-                addLog('videoLogs', `POST ${GEMINI_API_BASE_URL}/models/${MODELS.VIDEO}:predictLongRunning`, 'info');
+                addLog('videoLogs', `POST ${modelId}:predictLongRunning`, 'info');
 
                 const startResponse = await fetch(
-                    `${GEMINI_API_BASE_URL}/models/${MODELS.VIDEO}:predictLongRunning`,
+                    `${GEMINI_API_BASE_URL}/models/${modelId}:predictLongRunning`,
                     {
                         method: 'POST',
                         headers: {
@@ -1062,37 +1746,34 @@ Format as a JSON object with: flora (array), fauna (array), climate (object with
                 const startData = await startResponse.json();
 
                 if (!startResponse.ok) {
-                    document.getElementById('videoResponse').innerHTML = `<pre>${JSON.stringify(startData, null, 2)}</pre>`;
+                    document.getElementById('videoResponse').innerHTML = createCodeBlock('videoRes', 'Response JSON', startData, true);
                     throw new Error(`API Error ${startResponse.status}: ${startData.error?.message || 'Unknown error'}`);
                 }
 
                 const operationId = startData.name;
                 if (!operationId) {
-                    throw new Error('No operation ID returned from API');
+                    throw new Error('No operation ID returned');
                 }
 
-                addLog('videoLogs', `Operation started: ${operationId}`, 'success');
-                document.getElementById('videoOperationStatus').textContent = `Operation: ${operationId}`;
+                addLog('videoLogs', `Operation: ${operationId}`, 'success');
+                document.getElementById('videoOperationStatus').textContent = `Operation: ${operationId.split('/').pop()}`;
 
-                // Step 2: Poll for completion - Same logic as videoGenerator.ts
                 let attempts = 0;
-                let video = null;
 
                 while (attempts < MAX_POLL_ATTEMPTS) {
                     attempts++;
                     const progress = Math.min((attempts / MAX_POLL_ATTEMPTS) * 100, 95);
                     document.querySelector('#videoProgress .fill').style.width = `${progress}%`;
 
-                    addLog('videoLogs', `Polling attempt ${attempts}/${MAX_POLL_ATTEMPTS}...`, 'info');
-                    setStatus('videoStatus', 'pending', `PROCESSING (${attempts}/${MAX_POLL_ATTEMPTS})`);
+                    addLog('videoLogs', `Polling ${attempts}/${MAX_POLL_ATTEMPTS}...`, 'info');
+                    setStatus('videoStatus', 'pending', `PROCESSING ${attempts}/${MAX_POLL_ATTEMPTS}`);
+                    document.getElementById('videoOperationStatus').textContent = `Processing... (${attempts}/${MAX_POLL_ATTEMPTS})`;
 
                     const pollResponse = await fetch(
                         `${GEMINI_API_BASE_URL}/${operationId}`,
                         {
                             method: 'GET',
-                            headers: {
-                                'x-goog-api-key': apiKey,
-                            },
+                            headers: { 'x-goog-api-key': apiKey },
                         }
                     );
 
@@ -1103,20 +1784,18 @@ Format as a JSON object with: flora (array), fauna (array), climate (object with
                     }
 
                     if (pollData.done) {
-                        addLog('videoLogs', 'Video generation complete!', 'success');
+                        addLog('videoLogs', 'Generation complete!', 'success');
                         document.querySelector('#videoProgress .fill').style.width = '100%';
-                        document.getElementById('videoResponse').innerHTML = `<pre>${JSON.stringify(pollData, null, 2)}</pre>`;
+                        document.getElementById('videoResponse').innerHTML = createCodeBlock('videoRes', 'Response JSON', pollData, true);
 
-                        // Extract video URI - Same logic as videoGenerator.ts
                         const videoUri =
                             pollData.response?.generateVideoResponse?.generatedSamples?.[0]?.video?.uri ||
                             pollData.response?.generatedVideos?.[0]?.video?.uri;
 
                         if (videoUri) {
-                            addLog('videoLogs', `Video URI: ${videoUri}`, 'success');
-
-                            // Download video
+                            addLog('videoLogs', `Video URI: ${videoUri.substring(0, 60)}...`, 'success');
                             addLog('videoLogs', 'Downloading video...', 'info');
+
                             const videoResponse = await fetch(videoUri, {
                                 headers: { 'x-goog-api-key': apiKey }
                             });
@@ -1131,10 +1810,11 @@ Format as a JSON object with: flora (array), fauna (array), climate (object with
                                 videoEl.style.maxWidth = '100%';
                                 document.getElementById('videoPreview').appendChild(videoEl);
 
-                                addLog('videoLogs', `Video downloaded: ${(videoBlob.size / 1024 / 1024).toFixed(2)} MB`, 'success');
-                                setStatus('videoStatus', 'success', 'SUCCESS');
+                                addLog('videoLogs', `Downloaded: ${(videoBlob.size / 1024 / 1024).toFixed(2)} MB`, 'success');
+                                setStatus('videoStatus', 'success', 'COMPLETE');
+                                document.getElementById('videoOperationStatus').textContent = 'Complete';
                             } else {
-                                addLog('videoLogs', `Failed to download video: ${videoResponse.status}`, 'error');
+                                addLog('videoLogs', `Download failed: ${videoResponse.status}`, 'error');
                             }
                         } else {
                             throw new Error('No video URI in response');
@@ -1142,53 +1822,70 @@ Format as a JSON object with: flora (array), fauna (array), climate (object with
                         break;
                     }
 
-                    // Wait before next poll - Same as app
                     await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
                 }
 
                 if (attempts >= MAX_POLL_ATTEMPTS) {
-                    throw new Error('Video generation timed out');
+                    throw new Error('Generation timed out');
                 }
 
             } catch (error) {
                 setStatus('videoStatus', 'error', 'FAILED');
                 addLog('videoLogs', `Error: ${error.message}`, 'error');
-                document.getElementById('videoProgress').classList.add('hidden');
+                document.getElementById('videoOperationStatus').textContent = 'Failed';
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '🚀 Generate Video (REAL API CALL)';
+                btn.innerHTML = 'Execute Generation';
             }
         }
 
-        // Update cost estimate when duration changes
-        document.getElementById('videoDuration').addEventListener('change', function () {
-            const cost = (parseInt(this.value) * 0.15).toFixed(2);
-            document.getElementById('videoCostEstimate').innerHTML = `💰 Estimated Cost: $${cost} (${this.value} seconds × $0.15/sec)`;
-        });
+
 
         // ============================================
-        // TEXT GENERATION - Same flow as textGenerator.ts
+        // TEXT GENERATION
         // ============================================
         async function testTextGeneration() {
             const apiKey = getApiKey();
             if (!apiKey) {
-                alert('Please enter your API key first!');
+                alert('Please enter your API key first');
                 return;
             }
 
+            const modelId = document.getElementById('textModel').value;
+            const model = TEXT_MODELS[modelId];
             const systemPrompt = document.getElementById('textSystemPrompt').value;
             const userPrompt = document.getElementById('textPrompt').value;
+            const temperature = parseFloat(document.getElementById('textTemperature').value);
+            const maxTokens = parseInt(document.getElementById('textMaxTokens').value);
+            const thinkingBudget = parseInt(document.getElementById('textThinkingBudget').value);
             const btn = document.getElementById('textTestBtn');
 
             clearLogs('textLogs');
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner"></span> Generating...';
-            setStatus('textStatus', 'pending', 'GENERATING...');
+            setStatus('textStatus', 'pending', 'PROCESSING');
+            document.getElementById('tokenUsage').classList.add('hidden');
+            document.getElementById('textPreview').classList.add('hidden');
 
-            addLog('textLogs', 'Starting text generation...', 'info');
-            addLog('textLogs', `Model: ${MODELS.TEXT}`, 'info');
+            addLog('textLogs', 'Initializing text generation...', 'info');
+            addLog('textLogs', `Model: ${modelId}`, 'info');
+            addLog('textLogs', `Config: temp=${temperature}, maxTokens=${maxTokens}`, 'info');
+            if (model.supportsThinking && thinkingBudget > 0) {
+                addLog('textLogs', `Thinking budget: ${thinkingBudget} tokens`, 'info');
+            }
 
-            // Build request body - Same structure as textGenerator.ts
+            const generationConfig = {
+                temperature: temperature,
+                maxOutputTokens: maxTokens,
+            };
+
+            // Add thinking budget if supported and enabled
+            if (model.supportsThinking && thinkingBudget > 0) {
+                generationConfig.thinkingConfig = {
+                    thinkingBudget: thinkingBudget
+                };
+            }
+
             const requestBody = {
                 system_instruction: {
                     parts: [{ text: systemPrompt }]
@@ -1197,63 +1894,78 @@ Format as a JSON object with: flora (array), fauna (array), climate (object with
                     role: 'user',
                     parts: [{ text: userPrompt }]
                 }],
-                generationConfig: {
-                    temperature: 0.7,
-                    maxOutputTokens: 2048,
-                }
+                generationConfig: generationConfig
             };
 
-            document.getElementById('textRequest').innerHTML = `<pre>${JSON.stringify(requestBody, null, 2)}</pre>`;
+            document.getElementById('textRequest').innerHTML = createCodeBlock('textReq', 'Request JSON', requestBody, false);
 
             try {
-                addLog('textLogs', `POST ${GEMINI_API_BASE_URL}/models/${MODELS.TEXT}:generateContent`, 'info');
+                addLog('textLogs', `POST ${modelId}:generateContent`, 'info');
 
                 const response = await fetch(
-                    `${GEMINI_API_BASE_URL}/models/${MODELS.TEXT}:generateContent?key=${apiKey}`,
+                    `${GEMINI_API_BASE_URL}/models/${modelId}:generateContent?key=${apiKey}`,
                     {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(requestBody),
                     }
                 );
 
                 const responseData = await response.json();
-                document.getElementById('textResponse').innerHTML = `<pre>${JSON.stringify(responseData, null, 2)}</pre>`;
+                document.getElementById('textResponse').innerHTML = createCodeBlock('textRes', 'Response JSON', responseData, true);
 
                 if (!response.ok) {
                     throw new Error(`API Error ${response.status}: ${responseData.error?.message || 'Unknown error'}`);
                 }
 
-                addLog('textLogs', `Response status: ${response.status}`, 'success');
+                addLog('textLogs', `Response: ${response.status} OK`, 'success');
+                setStatus('textStatus', 'success', 'COMPLETE');
 
-                // Extract text from response
                 const text = responseData.candidates?.[0]?.content?.parts?.[0]?.text;
+                const finishReason = responseData.candidates?.[0]?.finishReason;
+                
                 if (text) {
                     addLog('textLogs', `Generated ${text.length} characters`, 'success');
-                    setStatus('textStatus', 'success', 'SUCCESS');
+                    
+                    // Show text preview
+                    document.getElementById('textPreview').classList.remove('hidden');
+                    document.getElementById('textPreview-pre').textContent = text;
+                } else {
+                    document.getElementById('textPreview').classList.add('hidden');
+                    
+                    if (finishReason === 'MAX_TOKENS') {
+                        addLog('textLogs', '⚠️ No text output: Model hit token limit during thinking phase', 'warning');
+                        addLog('textLogs', 'Try: Reduce thinking budget or increase max output tokens', 'warning');
+                    } else {
+                        addLog('textLogs', `No text content in response (finishReason: ${finishReason})`, 'warning');
+                    }
                 }
 
-                // Show token usage if available
                 const usageMetadata = responseData.usageMetadata;
                 if (usageMetadata) {
                     const inputTokens = usageMetadata.promptTokenCount || 0;
-                    const outputTokens = usageMetadata.candidatesTokenCount || 0;
+                    // Handle both old and new field names for output tokens
+                    const outputTokens = usageMetadata.candidatesTokenCount || 
+                                       usageMetadata.thoughtsTokenCount || 
+                                       (usageMetadata.totalTokenCount - inputTokens) || 0;
                     const cachedTokens = usageMetadata.cachedContentTokenCount || 0;
 
-                    // Calculate cost (Gemini 2.5 Flash pricing)
-                    const inputCost = (inputTokens / 1000000) * 0.30;
-                    const outputCost = (outputTokens / 1000000) * 2.50;
+                    // Use selected model's pricing
+                    const inputCost = (inputTokens / 1000000) * model.inputPrice;
+                    const outputCost = (outputTokens / 1000000) * model.outputPrice;
                     const totalCost = inputCost + outputCost;
 
-                    document.getElementById('tokenUsage').innerHTML = `
-            Input: ${inputTokens.toLocaleString()} tokens ($${inputCost.toFixed(6)})<br>
-            Output: ${outputTokens.toLocaleString()} tokens ($${outputCost.toFixed(6)})<br>
-            Cached: ${cachedTokens.toLocaleString()} tokens<br>
-            <strong>Total Cost: $${totalCost.toFixed(6)}</strong>
-          `;
-                    addLog('textLogs', `Tokens: ${inputTokens} in, ${outputTokens} out, Cost: $${totalCost.toFixed(6)}`, 'info');
+                    document.getElementById('inputTokens').textContent = `${inputTokens.toLocaleString()} ($${inputCost.toFixed(6)})`;
+                    document.getElementById('outputTokens').textContent = `${outputTokens.toLocaleString()} ($${outputCost.toFixed(6)})`;
+                    document.getElementById('cachedTokens').textContent = cachedTokens.toLocaleString();
+                    document.getElementById('totalCost').textContent = `$${totalCost.toFixed(6)}`;
+                    document.getElementById('tokenUsage').classList.remove('hidden');
+
+                    addLog('textLogs', `Tokens: ${inputTokens} in, ${outputTokens} out`, 'info');
+                    addLog('textLogs', `Cost: $${totalCost.toFixed(6)} (${model.name})`, 'success');
+                    if (usageMetadata.thoughtsTokenCount) {
+                        addLog('textLogs', `Note: ${usageMetadata.thoughtsTokenCount} thinking tokens included`, 'info');
+                    }
                 }
 
             } catch (error) {
@@ -1261,7 +1973,7 @@ Format as a JSON object with: flora (array), fauna (array), climate (object with
                 addLog('textLogs', `Error: ${error.message}`, 'error');
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '🚀 Generate Text (REAL API CALL)';
+                btn.innerHTML = 'Execute Generation';
             }
         }
 
@@ -1273,35 +1985,36 @@ Format as a JSON object with: flora (array), fauna (array), climate (object with
             const logs = document.getElementById('diagnosticsLogs');
             logs.innerHTML = '';
 
+            const addDiagLog = (msg, type = 'info') => {
+                const entry = document.createElement('div');
+                entry.className = `log-entry ${type}`;
+                entry.innerHTML = `<span class="log-timestamp">${getTimestamp()}</span><span>${msg}</span>`;
+                logs.appendChild(entry);
+            };
+
             if (!apiKey) {
-                logs.innerHTML = '<div class="log-entry error">❌ Please enter an API key first</div>';
+                addDiagLog('✗ No API key provided', 'error');
                 return;
             }
 
-            const addDiagLog = (msg, type = 'info') => {
-                logs.innerHTML += `<div class="log-entry ${type}">[${getTimestamp()}] ${msg}</div>`;
-            };
+            addDiagLog('Starting diagnostics...', 'info');
 
-            addDiagLog('Starting API diagnostics...', 'info');
-
-            // Test 1: API Key validation
             try {
-                addDiagLog('Testing API key...', 'info');
+                addDiagLog('Validating API key...', 'info');
                 const response = await fetch(`${GEMINI_API_BASE_URL}/models?key=${apiKey}`);
                 if (response.ok) {
                     const data = await response.json();
-                    addDiagLog(`✅ API key valid. ${data.models?.length || 0} models available.`, 'success');
+                    addDiagLog(`✓ API key valid — ${data.models?.length || 0} models`, 'success');
                 } else {
                     const error = await response.json();
-                    addDiagLog(`❌ API key invalid: ${error.error?.message}`, 'error');
+                    addDiagLog(`✗ API key invalid: ${error.error?.message}`, 'error');
                     return;
                 }
             } catch (e) {
-                addDiagLog(`❌ Network error: ${e.message}`, 'error');
+                addDiagLog(`✗ Network error: ${e.message}`, 'error');
                 return;
             }
 
-            // Test 2: Check specific models
             const modelsToCheck = [
                 { name: 'gemini-2.5-flash', type: 'Text' },
                 { name: 'gemini-2.5-flash-image', type: 'Image' },
@@ -1310,22 +2023,21 @@ Format as a JSON object with: flora (array), fauna (array), climate (object with
 
             for (const model of modelsToCheck) {
                 try {
-                    addDiagLog(`Checking ${model.type} model: ${model.name}...`, 'info');
+                    addDiagLog(`Checking ${model.type}: ${model.name}...`, 'info');
                     const response = await fetch(`${GEMINI_API_BASE_URL}/models/${model.name}?key=${apiKey}`);
                     if (response.ok) {
-                        addDiagLog(`✅ ${model.type} model available: ${model.name}`, 'success');
+                        addDiagLog(`✓ ${model.type} model available`, 'success');
                     } else {
                         const error = await response.json();
-                        addDiagLog(`⚠️ ${model.type} model issue: ${error.error?.message}`, 'warning');
+                        addDiagLog(`⚠ ${model.type}: ${error.error?.message}`, 'warning');
                     }
                 } catch (e) {
-                    addDiagLog(`❌ Error checking ${model.name}: ${e.message}`, 'error');
+                    addDiagLog(`✗ ${model.name}: ${e.message}`, 'error');
                 }
             }
 
-            addDiagLog('Diagnostics complete!', 'success');
+            addDiagLog('Diagnostics complete', 'success');
         }
     </script>
 </body>
-
 </html>

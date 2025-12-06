@@ -539,11 +539,12 @@ export const textGenerator: TextGenerator = {
   /**
    * Calculate token usage and cost from API response
    * Requirement 11.1: Log token counts for input, output, and cached tokens
+   * Requirement 2.1: Apply the correct 90% discount rate of $0.03 per 1M tokens
    * 
    * Cost calculation based on Gemini 2.5 Flash pricing:
    * - Input: $0.30 per 1M tokens
    * - Output: $2.50 per 1M tokens
-   * - Cached: $0.075 per 1M tokens (75% discount)
+   * - Cached: $0.03 per 1M tokens (90% discount)
    */
   calculateTokenUsage(
     inputTokens: number,

@@ -1,43 +1,43 @@
 # Implementation Plan
 
-- [ ] 1. Fix critical security issue - Remove exposed API keys
+- [x] 1. Fix critical security issue - Remove exposed API keys
   - Remove hardcoded API key from `.env` file
   - Clear `.env` file and add comment directing users to provide their own keys
   - Verify `.env` is in `.gitignore`
   - Test that application prompts for API key on startup when none is configured
   - _Requirements: 1.1, 1.2, 1.3_
 
-- [ ]* 1.1 Write property test for API key security
+- [ ] 1.1 Write property test for API key security
   - **Property 1: No API keys in environment files**
   - **Validates: Requirements 1.1**
 
-- [ ]* 1.2 Write property test for API key prompt behavior
+- [ ] 1.2 Write property test for API key prompt behavior
   - **Property 2: API key prompt on missing key**
   - **Validates: Requirements 1.3**
 
-- [ ]* 1.3 Write property test for API key storage location
+- [ ] 1.3 Write property test for API key storage location
   - **Property 3: API key storage location**
   - **Validates: Requirements 1.4**
 
-- [ ]* 1.4 Write example test for repository structure
+- [ ] 1.4 Write example test for repository structure
   - **Example 1: Repository structure validation**
   - **Validates: Requirements 1.2**
 
-- [ ] 2. Fix cost tracking calculations
+- [x] 2. Fix cost tracking calculations
   - Update `CACHED_COST_PER_1M` constant in `deep-time-app/src/services/ai/types.ts` from 0.075 to 0.03
   - Verify `calculateTokenUsage()` in `textGenerator.ts` uses the correct constant
   - Update cost calculation documentation
   - _Requirements: 2.1, 2.3_
 
-- [ ]* 2.1 Write property test for cached token cost calculation
+- [x] 2.1 Write property test for cached token cost calculation
   - **Property 4: Cached token cost calculation**
   - **Validates: Requirements 2.1**
 
-- [ ]* 2.2 Write property test for cost report structure
+- [x] 2.2 Write property test for cost report structure
   - **Property 5: Cost report structure**
   - **Validates: Requirements 2.2**
 
-- [ ]* 2.3 Write example test for cached token pricing constant
+- [x] 2.3 Write example test for cached token pricing constant
   - **Example 2: Cached token pricing constant**
   - **Validates: Requirements 2.3**
 
