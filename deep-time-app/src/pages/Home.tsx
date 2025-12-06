@@ -62,11 +62,16 @@ export function Home({ onViewEraDetail }: HomeProps) {
   }, [loadCachedLocations]);
 
   // Request location on mount (Requirement 1.1)
-  // Note: On iOS Safari, geolocation requires user gesture, so we also show a button
+  // Note: On iOS Safari, geolocation requires user gesture, so we skip auto-request on iOS
   useEffect(() => {
-    // Only auto-request on desktop or if we haven't tried yet
+    // Check if iOS - don't auto-request on iOS as it requires user gesture
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    
     const hasTriedLocation = sessionStorage.getItem('locationRequested');
-    if (!location && !isLocationLoading && !error && !locationError && !hasTriedLocation) {
+    
+    // Only auto-request on non-iOS devices
+    if (!isIOS && !location && !isLocationLoading && !error && !locationError && !hasTriedLocation) {
       sessionStorage.setItem('locationRequested', 'true');
       requestLocation();
     }

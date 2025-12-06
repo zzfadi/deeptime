@@ -10,13 +10,13 @@
 
 export const GEMINI_MODELS = {
   /**
-   * Gemini 2.5 Flash-8B (Flash-Lite)
+   * Gemini 2.5 flash-lite (Flash-Lite)
    * - Fastest and most cost-efficient
    * - Perfect for high-frequency, real-time tasks
    * - Great for mobile AR interactions
    * - Use for: Creature narrations, quick responses
    */
-  FLASH_LITE: 'gemini-2.5-flash-8b',
+  FLASH_LITE: 'gemini-2.5-flash-lite',
   
   /**
    * Gemini 2.5 Flash
@@ -28,13 +28,13 @@ export const GEMINI_MODELS = {
   FLASH: 'gemini-2.5-flash',
   
   /**
-   * Gemini 2.5 Pro
+   * Gemini 3 Pro
    * - Most powerful reasoning
    * - Best for complex tasks
    * - Higher cost, slower
    * - Use for: Future advanced features
    */
-  PRO: 'gemini-2.5-pro',
+  PRO: 'gemini-3-pro',
 } as const;
 
 /**
@@ -62,7 +62,7 @@ export const MODEL_USE_CASES = {
  */
 export const MODEL_SPECS = {
   [GEMINI_MODELS.FLASH_LITE]: {
-    name: 'Gemini 2.5 Flash-8B',
+    name: 'Gemini 2.5 flash-lite',
     speed: 'fastest',
     cost: 'lowest',
     contextWindow: '1M tokens',
@@ -78,7 +78,7 @@ export const MODEL_SPECS = {
     latency: '~500-1000ms',
   },
   [GEMINI_MODELS.PRO]: {
-    name: 'Gemini 2.5 Pro',
+    name: 'Gemini 3 Pro',
     speed: 'moderate',
     cost: 'higher',
     contextWindow: '2M tokens',

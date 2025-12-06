@@ -113,13 +113,27 @@ interface SearchModalProps {
   onClose: () => void;
   onSearch: (query: string) => Promise<GeoCoordinate[]>;
   onLocationSelect: (location: GeoCoordinate) => void;
+  onRequestLocation?: () => void;
 }
 
-function SearchModal({ isOpen, onClose, onLocationSelect }: SearchModalProps) {
+function SearchModal({ isOpen, onClose, onLocationSelect, onRequestLocation }: SearchModalProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<GeoCoordinateWithName[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  const handleUseCurrentLocation = useCallback(() => {
+    if (!onRequestLocation) return;
+    setIsGettingLocation(true);
+    setError(null);
+    onRequestLocation();
+    // Close modal after a short delay to let location request start
+    setTimeout(() => {
+      onClose();
+      setIsGettingLocation(false);
+    }, 500);
+  }, [onRequestLocation, onClose]);
 
   const handleSearch = useCallback(async () => {
     if (!query.trim()) return;
@@ -167,7 +181,32 @@ function SearchModal({ isOpen, onClose, onLocationSelect }: SearchModalProps) {
       {/* Modal */}
       <div className="relative w-full max-w-md bg-deep-800 rounded-2xl shadow-xl animate-slide-up">
         <div className="p-4">
-          <h2 className="text-lg font-semibold mb-3">Search Location</h2>
+          <h2 className="text-lg font-semibold mb-3">Find Location</h2>
+          
+          {/* Use Current Location button - prominent for iOS */}
+          {onRequestLocation && (
+            <button
+              onClick={handleUseCurrentLocation}
+              disabled={isGettingLocation}
+              className="w-full mb-4 px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-600/50 text-white rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
+            >
+              {isGettingLocation ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2v2m0 16v2m10-10h-2M4 12H2m15.364-6.364l-1.414 1.414M6.05 17.95l-1.414 1.414m12.728 0l-1.414-1.414M6.05 6.05L4.636 4.636" />
+                </svg>
+              )}
+              Use My Current Location
+            </button>
+          )}
+          
+          <div className="flex items-center gap-3 mb-3">
+            <div className="flex-1 h-px bg-gray-600"></div>
+            <span className="text-gray-400 text-sm">or search</span>
+            <div className="flex-1 h-px bg-gray-600"></div>
+          </div>
           
           {/* Search input */}
           <div className="flex gap-2">
@@ -295,19 +334,23 @@ export function LocationHeader({
               {isReverseGeocoding ? formatCoordinates(location) : (locationName || formatCoordinates(location))}
             </span>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               {onRequestLocation && (
                 <button 
                   onClick={onRequestLocation}
-                  className="text-blue-400 hover:text-blue-300 transition-colors text-sm"
+                  className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium"
                 >
-                  📍 Use GPS
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2v2m0 16v2m10-10h-2M4 12H2m15.364-6.364l-1.414 1.414M6.05 17.95l-1.414 1.414m12.728 0l-1.414-1.414M6.05 6.05L4.636 4.636" />
+                  </svg>
+                  Use My Location
                 </button>
               )}
-              <span className="text-gray-500">or</span>
+              <span className="text-gray-500 text-sm">or</span>
               <button 
                 onClick={() => setIsSearchOpen(true)}
-                className="text-blue-400 hover:text-blue-300 transition-colors text-sm"
+                className="text-blue-400 hover:text-blue-300 transition-colors text-sm underline"
               >
                 Search
               </button>
@@ -335,6 +378,7 @@ export function LocationHeader({
         onClose={() => setIsSearchOpen(false)}
         onSearch={onSearch}
         onLocationSelect={onLocationSelect}
+        onRequestLocation={onRequestLocation}
       />
     </>
   );

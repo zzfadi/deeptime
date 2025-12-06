@@ -19,6 +19,10 @@ const EraDetail = lazy(() => import('./pages/EraDetail'));
 
 // Lazy load ARView for code splitting - Three.js is a large dependency
 const ARView = lazy(() => import('./components/ARView'));
+const IOSARView = lazy(() => import('./components/IOSARView'));
+
+// Import iOS detection
+import { isIOS } from './utils/iosARDetection';
 
 type Page = 'home' | 'era-detail' | 'ar';
 
@@ -128,6 +132,10 @@ function App() {
         setCurrentPage('home');
         return <FullPageSpinner />;
       }
+      
+      // Use iOS-specific AR view on iOS devices (WebXR not supported)
+      const ARComponent = isIOS() ? IOSARView : ARView;
+      
       return (
         <Suspense fallback={
           <div className="min-h-screen bg-deep-900 flex items-center justify-center">
@@ -136,7 +144,7 @@ function App() {
             </div>
           </div>
         }>
-          <ARView
+          <ARComponent
             era={currentEra}
             narrative={narrative}
             onExit={handleARExit}

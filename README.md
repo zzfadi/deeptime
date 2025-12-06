@@ -30,7 +30,7 @@ No installation required - just open in your browser and start exploring!
 |-------|------------|
 | Frontend | React 18 + TypeScript + Tailwind CSS |
 | 3D/AR | Three.js + WebXR + model-viewer (iOS) |
-| AI | Google Gemini 2.5 (Flash & Flash-8B) |
+| AI | Google Gemini 2.5 (Flash & flash-lite) |
 | Backend | Firebase (Firestore + Hosting) |
 | Geological Data | USGS Macrostrat API |
 | Geocoding | Nominatim (OpenStreetMap) |

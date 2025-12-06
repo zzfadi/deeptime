@@ -12,6 +12,13 @@ declare namespace JSX {
       'camera-controls'?: boolean;
       'touch-action'?: string;
       'auto-rotate'?: boolean;
+      'shadow-intensity'?: string;
+      'environment-image'?: string;
+      exposure?: string;
+      'ios-src'?: string;
+      poster?: string;
+      loading?: 'auto' | 'lazy' | 'eager';
+      reveal?: 'auto' | 'interaction' | 'manual';
       style?: React.CSSProperties;
     };
   }

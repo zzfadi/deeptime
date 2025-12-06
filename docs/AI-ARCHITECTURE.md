@@ -40,9 +40,9 @@ graph TB
     
     subgraph "AI Provider"
         Gemini[Google Gemini API]
-        FlashLite[gemini-2.5-flash-8b]
+        FlashLite[gemini-2.5-flash-lite]
         Flash[gemini-2.5-flash]
-        Pro[gemini-2.5-pro]
+        Pro[gemini-3-pro]
     end
     
     subgraph "Fallback System"
@@ -120,7 +120,7 @@ graph TB
 - `narrateEra(eraName, creatures)` - Era welcome narration
 - `calculateReadingTime(text)` - Auto-dismiss timing
 
-**AI Model**: `gemini-2.5-flash-8b` (Flash-Lite - Fastest, most cost-efficient)
+**AI Model**: `gemini-2.5-flash-lite` (Flash-Lite - Fastest, most cost-efficient)
 
 **Input**: `Creature` object containing:
 - Name and scientific name
@@ -408,30 +408,30 @@ DeepTime uses the latest Gemini 2.5 models for optimal performance and cost-effi
 
 | Model | Speed | Cost | Context | Best For | Use Case in DeepTime |
 |-------|-------|------|---------|----------|---------------------|
-| **Gemini 2.5 Flash-8B** | Fastest | Lowest | 1M tokens | Real-time interactions | Creature narrations, AR interactions |
+| **Gemini 2.5 flash-lite** | Fastest | Lowest | 1M tokens | Real-time interactions | Creature narrations, AR interactions |
 | **Gemini 2.5 Flash** | Fast | Moderate | 1M tokens | Balanced performance | Era narratives, detailed descriptions |
-| **Gemini 2.5 Pro** | Moderate | Higher | 2M tokens | Complex reasoning | Future: Quizzes, personalization |
+| **Gemini 3 Pro** | Moderate | Higher | 2M tokens | Complex reasoning | Future: Quizzes, personalization |
 
 ### Model Assignment by Feature
 
 ```typescript
 // Real-time AR creature interactions (tap-to-narrate)
-CREATURE_NARRATION: 'gemini-2.5-flash-8b'  // ~200-500ms latency
+CREATURE_NARRATION: 'gemini-2.5-flash-lite'  // ~200-500ms latency
 
 // Era welcome messages in AR
-ERA_WELCOME: 'gemini-2.5-flash-8b'  // Fast, engaging
+ERA_WELCOME: 'gemini-2.5-flash-lite'  // Fast, engaging
 
 // Detailed geological era narratives
 ERA_NARRATIVE: 'gemini-2.5-flash'  // Better reasoning for complex data
 
 // Future: Educational features
-QUIZ_GENERATION: 'gemini-2.5-pro'  // Advanced reasoning
-PERSONALIZATION: 'gemini-2.5-pro'  // Complex user modeling
+QUIZ_GENERATION: 'gemini-3-pro'  // Advanced reasoning
+PERSONALIZATION: 'gemini-3-pro'  // Complex user modeling
 ```
 
 ### Why This Strategy?
 
-**Flash-8B for AR Interactions**:
+**flash-lite for AR Interactions**:
 - **Latency matters**: Users expect instant feedback when tapping creatures
 - **High frequency**: Users may tap multiple creatures rapidly
 - **Mobile optimization**: Faster responses on mobile networks
@@ -457,9 +457,9 @@ PERSONALIZATION: 'gemini-2.5-pro'  // Complex user modeling
 **Endpoint**: `https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent`
 
 **Models Used**:
-- **gemini-2.5-flash-8b** (Flash-Lite) - Real-time AR creature narrations & era welcomes
+- **gemini-2.5-flash-lite** (Flash-Lite) - Real-time AR creature narrations & era welcomes
 - **gemini-2.5-flash** (Flash) - Detailed geological era narratives
-- **gemini-2.5-pro** (Pro) - Future advanced features (quizzes, personalization)
+- **gemini-3-pro** (Pro) - Future advanced features (quizzes, personalization)
 
 **Authentication**: API Key (Bearer token)
 
@@ -912,7 +912,7 @@ curl -X POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-
   -d '{"contents":[{"parts":[{"text":"Generate a Cretaceous era narrative"}]}]}'
 
 # Test creature narration (Flash-Lite)
-curl -X POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-8b:generateContent \
+curl -X POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent \
   -H "Content-Type: application/json" \
   -H "x-goog-api-key: YOUR_API_KEY" \
   -d '{"contents":[{"parts":[{"text":"Tell me about T-Rex"}]}]}'

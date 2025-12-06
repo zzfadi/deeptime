@@ -526,7 +526,7 @@ export const creatureNarrationService = {
     }
     
     try {
-      // Use Gemini 2.5 Flash-8B for fast, cost-efficient creature narrations
+      // Use Gemini 2.5 flash-lite for fast, cost-efficient creature narrations
       const model = client.getGenerativeModel({ model: MODEL_USE_CASES.CREATURE_NARRATION });
       const prompt = buildCreatureNarrationPrompt(creature);
       
@@ -571,7 +571,7 @@ export const creatureNarrationService = {
     }
     
     try {
-      // Use Gemini 2.5 Flash-8B for fast era welcome narrations
+      // Use Gemini 2.5 flash-lite for fast era welcome narrations
       const model = client.getGenerativeModel({ model: MODEL_USE_CASES.ERA_WELCOME });
       const prompt = buildEraNarrationPrompt(eraName, creatures);
       
