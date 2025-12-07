@@ -1,0 +1,83 @@
+# Implementation Plan
+
+- [x] 1. Create core cross-section components
+  - [x] 1.1 Create LayerStratum component with era-specific styling
+    - Create `deep-time-app/src/components/LayerStratum.tsx`
+    - Implement era color mapping with earth tones palette
+    - Add texture overlay using CSS noise/grain
+    - Include depth perspective transforms
+    - _Requirements: 1.1, 1.2_
+  - [x] 1.2 Write property test for layer color mapping
+    - **Property 2: Distinct layer coloring**
+    - **Validates: Requirements 1.2**
+  - [x] 1.3 Create LayerStack component for 3D layer rendering
+    - Create `deep-time-app/src/components/LayerStack.tsx`
+    - Implement scroll-based 3D transforms
+    - Add parallax depth effect on scroll
+    - Handle layer click events
+    - _Requirements: 1.1, 2.1, 2.2_
+  - [x] 1.4 Write property test for layer count preservation
+    - **Property 1: Layer count preservation**
+    - **Validates: Requirements 1.1**
+
+- [x] 2. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 3. Create info panel and selection logic
+  - [x] 3.1 Create LayerInfoPanel component
+    - Create `deep-time-app/src/components/LayerInfoPanel.tsx`
+    - Display era name, time period, narrative description
+    - Show climate, flora, fauna when available
+    - Add AI image/video generation buttons
+    - Include "View Details" navigation button
+    - Style with slide-up animation (mobile) / side panel (desktop)
+    - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
+  - [x] 3.2 Write property test for panel content completeness
+    - **Property 5: Panel content completeness**
+    - **Validates: Requirements 3.1, 3.2**
+  - [x] 3.3 Implement layer selection state management
+    - Add scroll position tracking with normalized 0-1 value
+    - Implement `getActiveLayerFromScroll` helper
+    - Add depth indicator display
+    - Integrate haptic feedback at era boundaries
+    - _Requirements: 2.2, 2.3, 2.4_
+  - [x] 3.4 Write property tests for selection logic
+    - **Property 3: Layer selection state consistency**
+    - **Property 4: Depth indicator accuracy**
+    - **Validates: Requirements 2.2, 2.3**
+
+- [x] 4. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 5. Create main CrossSectionView and integrate
+  - [x] 5.1 Create CrossSectionView container component
+    - Create `deep-time-app/src/components/CrossSectionView.tsx`
+    - Compose LayerStack and LayerInfoPanel
+    - Handle scroll/touch interactions
+    - Manage active layer state
+    - Add empty state placeholder
+    - _Requirements: 1.4, 2.1, 4.1, 4.2_
+  - [x] 5.2 Integrate AI content generation
+    - Connect to contentOrchestrator for narratives
+    - Wire up image/video generation buttons
+    - Display generated content in panel
+    - _Requirements: 3.3, 3.4_
+  - [x] 5.3 Write property test for AI content display
+    - **Property 6: AI content display**
+    - **Validates: Requirements 3.4**
+
+- [x] 6. Update Home page to use CrossSectionView
+  - [x] 6.1 Replace existing Home page layout
+    - Remove TimeSlider and EraCard from main view
+    - Replace GeologicalStackView with CrossSectionView
+    - Keep LocationHeader unchanged
+    - Wire up navigation to EraDetail page
+    - _Requirements: 1.1, 3.5_
+  - [x] 6.2 Add responsive layout handling
+    - Implement mobile-first layout (panel slides from bottom)
+    - Add desktop layout variant (side panel)
+    - Handle orientation changes
+    - _Requirements: 4.1, 4.3_
+
+- [x] 7. Final Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.

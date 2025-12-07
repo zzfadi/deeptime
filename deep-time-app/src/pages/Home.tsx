@@ -1,46 +1,47 @@
 /**
  * Home Page Component
- * Main view with crossfading era cards during slider navigation
- * Requirements: 1.1, 1.2, 3.1, 5.3
+ * Main view with 3D cross-section visualization of geological layers
+ * Requirements: 1.1, 1.2, 3.5, 4.1, 4.3
  */
 
-import { useEffect, useCallback, useState, useMemo } from 'react';
-import { useAppStore, getEraBoundaries } from '../store/appStore';
-import { LocationHeader, TimeSlider, EraCard, FullPageSpinner, OnlineStatusToast } from '../components';
-import type { TransitionState } from '../components/TimeSlider';
+import { useEffect, useCallback } from 'react';
+import { useAppStore } from '../store/appStore';
+import { LocationHeader, FullPageSpinner, OnlineStatusToast, CrossSectionView } from '../components';
 import { GPSDeniedView, APIErrorView, OfflineView } from './ErrorViews';
 import { useOfflineStatus } from '../hooks';
-import type { GeoCoordinate, GeologicalLayer, Narrative } from 'deep-time-core/types';
+import type { GeoCoordinate, GeologicalLayer } from 'deep-time-core/types';
 
 export interface HomeProps {
   onViewEraDetail?: () => void;
 }
 
+/**
+ * Home Page - 3D Cross-Section View
+ * Requirement 1.1: Render 3D visualization showing all geological layers
+ * Requirement 3.5: Navigate to full EraDetail page
+ * Requirement 4.1: Fill available screen space on mobile
+ * Requirement 4.3: Adapt layout on orientation changes
+ */
 export function Home({ onViewEraDetail }: HomeProps) {
   const {
     location,
     isLocationLoading,
     geologicalStack,
-    currentEra,
-    timePosition,
-    narrative,
-    isNarrativeLoading,
     isLoading,
     error,
     locationError,
     requestLocation,
     searchLocation,
     setLocation,
-    setTimePosition,
     initializeForLocation,
     clearErrors,
     setOfflineStatus,
     loadCachedLocations,
     narrativeCache,
+    selectEra,
   } = useAppStore();
 
   const { isOffline, justCameOnline } = useOfflineStatus();
-  const [transition, setTransition] = useState<TransitionState | null>(null);
 
   useEffect(() => {
     setOfflineStatus(isOffline);
@@ -50,6 +51,7 @@ export function Home({ onViewEraDetail }: HomeProps) {
     loadCachedLocations();
   }, [loadCachedLocations]);
 
+  // Auto-request location on non-iOS devices
   useEffect(() => {
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -78,38 +80,28 @@ export function Home({ onViewEraDetail }: HomeProps) {
     requestLocation();
   }, [clearErrors, requestLocation]);
 
-  const handleTransitionChange = useCallback((state: TransitionState) => {
-    setTransition(state);
-  }, []);
+  /**
+   * Handle layer selection from CrossSectionView
+   * Updates the app store with the selected era
+   */
+  const handleLayerSelect = useCallback((layer: GeologicalLayer) => {
+    selectEra(layer);
+  }, [selectEra]);
 
-  const eraBoundaries = getEraBoundaries(geologicalStack);
-
-  // Get current and next era layers for crossfading
-  const currentEraLayer = useMemo((): GeologicalLayer | null => {
-    if (!transition?.currentEra || !geologicalStack) return currentEra;
-    return geologicalStack.layers.find(l => l.id === transition.currentEra?.layerId) || currentEra;
-  }, [transition?.currentEra, geologicalStack, currentEra]);
-
-  const nextEraLayer = useMemo((): GeologicalLayer | null => {
-    if (!transition?.isDragging || !transition?.nextEra || !geologicalStack) return null;
-    return geologicalStack.layers.find(l => l.id === transition.nextEra?.layerId) || null;
-  }, [transition?.isDragging, transition?.nextEra, geologicalStack]);
-
-  // Get cached narratives for both eras
-  const currentNarrative = useMemo((): Narrative | null => {
-    if (!currentEraLayer) return narrative;
-    return narrativeCache.get(currentEraLayer.id) || narrative;
-  }, [currentEraLayer, narrativeCache, narrative]);
-
-  const nextNarrative = useMemo((): Narrative | null => {
-    if (!nextEraLayer) return null;
-    return narrativeCache.get(nextEraLayer.id) || null;
-  }, [nextEraLayer, narrativeCache]);
+  /**
+   * Handle view details navigation
+   * Requirement 3.5: Navigate to full EraDetail page
+   */
+  const handleViewDetails = useCallback((layer: GeologicalLayer) => {
+    selectEra(layer);
+    onViewEraDetail?.();
+  }, [selectEra, onViewEraDetail]);
 
   const isGPSDenied = locationError?.includes('denied') ||
     locationError?.includes('permission') ||
     locationError?.includes('blocked');
 
+  // Error states
   if (isGPSDenied && !geologicalStack) {
     return (
       <GPSDeniedView
@@ -157,13 +149,9 @@ export function Home({ onViewEraDetail }: HomeProps) {
     );
   }
 
-  // Calculate opacity for crossfade between consecutive eras
-  const showCrossfade = transition?.isDragging && nextEraLayer && transition.progress > 0;
-  const currentOpacity = showCrossfade ? 1 - transition.progress : 1;
-  const nextOpacity = showCrossfade ? transition.progress : 0;
-
   return (
-    <div className="min-h-screen bg-deep-900 text-white flex flex-col">
+    <div className="h-screen bg-deep-900 text-white flex flex-col overflow-hidden">
+      {/* LocationHeader - kept unchanged per requirements */}
       <LocationHeader
         location={location}
         isLoading={isLocationLoading}
@@ -173,160 +161,21 @@ export function Home({ onViewEraDetail }: HomeProps) {
         onRequestLocation={handleRequestLocation}
       />
 
-      <main className="flex-1 flex flex-col md:flex-row p-4 gap-4 overflow-hidden">
-        {geologicalStack && eraBoundaries.length > 0 && (
-          <div className="h-64 md:h-auto md:w-48 flex-shrink-0">
-            <TimeSlider
-              value={timePosition}
-              onChange={setTimePosition}
-              eraBoundaries={eraBoundaries}
-              snapToEra={true}
-              onTransitionChange={handleTransitionChange}
-            />
-          </div>
-        )}
-
-        <div className="flex-1 overflow-y-auto">
-          {/* Era Cards with crossfade during drag */}
-          <div
-            onClick={onViewEraDetail}
-            className={`relative ${onViewEraDetail ? 'cursor-pointer' : ''}`}
-          >
-            {/* Current era - always visible, fades out when transitioning to next */}
-            <div
-              className="transition-opacity duration-150"
-              style={{ opacity: currentOpacity }}
-            >
-              <EraCard
-                era={currentEraLayer}
-                narrative={currentNarrative}
-                isLoading={isNarrativeLoading}
-                webXRSupported={false}
-              />
-            </div>
-
-            {/* Next era - overlaid on top, fades in during transition */}
-            {showCrossfade && (
-              <div
-                className="absolute inset-0 transition-opacity duration-150 pointer-events-none"
-                style={{ opacity: nextOpacity }}
-              >
-                <EraCard
-                  era={nextEraLayer}
-                  narrative={nextNarrative}
-                  isLoading={false}
-                  webXRSupported={false}
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Geological Stack */}
-          {geologicalStack && (
-            <GeologicalStackView
-              layers={geologicalStack.layers}
-              currentEraId={currentEra?.id}
-              onLayerClick={(layer) => setTimePosition(layer.era.yearsAgo)}
-            />
-          )}
-        </div>
+      {/* Main content area - CrossSectionView fills remaining space */}
+      {/* Requirement 4.1: Fill available screen space on mobile */}
+      {/* Requirement 4.3: Adapt layout on orientation changes */}
+      <main className="flex-1 overflow-hidden">
+        <CrossSectionView
+          geologicalStack={geologicalStack}
+          narrativeCache={narrativeCache}
+          onLayerSelect={handleLayerSelect}
+          onViewDetails={handleViewDetails}
+          isLoading={isLoading}
+          location={location}
+        />
       </main>
 
-      <footer className="px-4 py-2 text-center text-xs text-gray-500 safe-bottom">
-        DeepTime • Explore geological time beneath your feet
-      </footer>
-
       <OnlineStatusToast isOffline={isOffline} justCameOnline={justCameOnline} />
-    </div>
-  );
-}
-
-
-/** Redesigned Geological Stack View */
-interface GeologicalStackViewProps {
-  layers: GeologicalLayer[];
-  currentEraId?: string;
-  onLayerClick: (layer: GeologicalLayer) => void;
-}
-
-function GeologicalStackView({ layers, currentEraId, onLayerClick }: GeologicalStackViewProps) {
-  const sortedLayers = [...layers].sort((a, b) => a.depthStart - b.depthStart);
-  const displayLayers = sortedLayers.slice(0, 6);
-
-  return (
-    <div className="mt-4 rounded-xl overflow-hidden" style={{ background: 'linear-gradient(180deg, #12151a 0%, #0d0f12 100%)' }}>
-      <div className="px-4 py-3 border-b border-white/5">
-        <h3 className="text-xs font-semibold text-white/50 uppercase tracking-wider">
-          Geological Column
-        </h3>
-      </div>
-
-      <div className="p-2">
-        {displayLayers.map((layer, index) => {
-          const isActive = currentEraId === layer.id;
-          const depth = layer.era.yearsAgo;
-          const hue = 120 - (index / displayLayers.length) * 80; // Green to amber
-
-          return (
-            <button
-              key={layer.id}
-              onClick={() => onLayerClick(layer)}
-              className={`w-full flex items-center gap-3 p-3 rounded-lg mb-1 transition-all duration-200 text-left ${
-                isActive ? 'ring-1 ring-white/20' : 'hover:bg-white/5'
-              }`}
-              style={{
-                background: isActive
-                  ? `linear-gradient(90deg, hsla(${hue}, 40%, 25%, 0.4), transparent)`
-                  : 'transparent',
-              }}
-            >
-              {/* Stratum indicator */}
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-sm"
-                style={{
-                  background: `linear-gradient(135deg, hsl(${hue}, 35%, 30%), hsl(${hue}, 30%, 20%))`,
-                  boxShadow: isActive ? `0 0 12px hsla(${hue}, 50%, 40%, 0.4)` : 'none',
-                }}
-              >
-                <span className="text-white/80 font-medium">{index + 1}</span>
-              </div>
-
-              {/* Era info */}
-              <div className="flex-1 min-w-0">
-                <div className={`text-sm font-medium truncate ${isActive ? 'text-white' : 'text-white/70'}`}>
-                  {layer.era.name}
-                </div>
-                <div className="text-xs text-white/40 flex items-center gap-2">
-                  <span>{layer.depthStart}m – {layer.depthEnd}m</span>
-                  <span className="w-1 h-1 rounded-full bg-white/20" />
-                  <span className="capitalize">{layer.material}</span>
-                </div>
-              </div>
-
-              {/* Time badge */}
-              <div
-                className="px-2 py-1 rounded text-[10px] font-medium"
-                style={{
-                  background: isActive ? `hsla(${hue}, 40%, 30%, 0.5)` : 'rgba(255,255,255,0.05)',
-                  color: isActive ? `hsl(${hue}, 60%, 70%)` : 'rgba(255,255,255,0.4)',
-                }}
-              >
-                {depth >= 1_000_000
-                  ? `${(depth / 1_000_000).toFixed(0)}M`
-                  : depth >= 1_000
-                    ? `${(depth / 1_000).toFixed(0)}K`
-                    : depth} ya
-              </div>
-            </button>
-          );
-        })}
-
-        {layers.length > 6 && (
-          <div className="text-center py-2">
-            <span className="text-xs text-white/30">+{layers.length - 6} deeper layers</span>
-          </div>
-        )}
-      </div>
     </div>
   );
 }

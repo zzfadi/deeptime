@@ -66,3 +66,18 @@ export type { FloatingControlButtonProps } from './FloatingControlButton';
 // AI-generated Fossil Glyph icons for eras
 export { FossilGlyph } from './FossilGlyph';
 export type { FossilGlyphProps } from './FossilGlyph';
+
+// 3D Cross-Section View components - Requirements: 1.1, 1.2, 2.1, 2.2
+export { LayerStratum, getLayerColors, calculateLayerTransform } from './LayerStratum';
+export type { LayerStratumProps, LayerColors } from './LayerStratum';
+
+export { LayerStack, getActiveLayerFromScroll } from './LayerStack';
+export type { LayerStackProps } from './LayerStack';
+
+// Layer Info Panel for cross-section view - Requirements: 3.1, 3.2, 3.3, 3.4, 3.5
+export { LayerInfoPanel, extractPanelContent } from './LayerInfoPanel';
+export type { LayerInfoPanelProps } from './LayerInfoPanel';
+
+// CrossSectionView container - Requirements: 1.4, 2.1, 3.3, 3.4, 4.1, 4.2
+export { CrossSectionView, hasAIImage, hasAIVideo } from './CrossSectionView';
+export type { CrossSectionViewProps } from './CrossSectionView';

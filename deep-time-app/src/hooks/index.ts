@@ -22,3 +22,15 @@ export type { CacheInitializationState, CacheInitializationOptions } from './use
 
 export { useEraGlyph } from './useEraGlyph';
 export type { default as UseEraGlyphResult } from './useEraGlyph';
+
+// Cross-section state management - Requirements: 2.2, 2.3, 2.4
+export { 
+  useCrossSectionState, 
+  getActiveLayerFromScroll as getCrossSectionActiveLayer,
+  getDepthIndicator 
+} from './useCrossSectionState';
+export type { 
+  CrossSectionState, 
+  CrossSectionActions, 
+  UseCrossSectionStateReturn 
+} from './useCrossSectionState';

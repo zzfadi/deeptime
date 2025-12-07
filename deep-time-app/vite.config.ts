@@ -8,6 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      injectRegister: 'auto',
       includeAssets: [
         'favicon.ico',
         'apple-touch-icon.png',
@@ -62,6 +63,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // 3MB limit
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/mrdata\.usgs\.gov\/.*/i,

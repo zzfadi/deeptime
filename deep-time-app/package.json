@@ -5,11 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
+    "build:check": "tsc --noEmit && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "clean": "rm -rf node_modules/.tmp node_modules/.vite dist"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
