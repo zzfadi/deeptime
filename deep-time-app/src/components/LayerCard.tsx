@@ -7,7 +7,7 @@
  * with textures, colors, and fossils emerging when tapped.
  */
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { GeologicalLayer, GeoCoordinate, Narrative } from 'deep-time-core/types';
 import type { GeneratedImage, GeneratedVideo } from '../services/ai/types';
 import { formatYearsAgo } from './TimeSlider';
@@ -120,32 +120,31 @@ function GeneratedImageDisplay({
   image: GeneratedImage | null; 
   eraName: string;
 }) {
-  // Use ref to track the blob URL so we can clean it up properly
-  const blobUrlRef = useRef<string | null>(null);
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
   
-  // Create blob URL when image changes
-  if (image?.imageData && !blobUrlRef.current) {
-    blobUrlRef.current = URL.createObjectURL(image.imageData);
-  }
-  
-  // Cleanup on unmount or when image changes
+  // Create and cleanup blob URL when image changes
   useEffect(() => {
-    const currentBlobUrl = blobUrlRef.current;
+    if (!image?.imageData) {
+      setBlobUrl(null);
+      return;
+    }
     
+    // Create new blob URL
+    const url = URL.createObjectURL(image.imageData);
+    setBlobUrl(url);
+    
+    // Cleanup on unmount or when image changes
     return () => {
-      if (currentBlobUrl) {
-        URL.revokeObjectURL(currentBlobUrl);
-        blobUrlRef.current = null;
-      }
+      URL.revokeObjectURL(url);
     };
   }, [image?.imageData]);
 
-  if (!image || !blobUrlRef.current) return null;
+  if (!image || !blobUrl) return null;
 
   return (
     <div className="rounded-lg overflow-hidden">
       <img
-        src={blobUrlRef.current}
+        src={blobUrl}
         alt={`AI visualization of ${eraName}`}
         className="w-full h-auto"
         loading="lazy"
@@ -159,32 +158,31 @@ function GeneratedImageDisplay({
  * Requirement 3.5: Display generated video inline below image
  */
 function GeneratedVideoDisplay({ video }: { video: GeneratedVideo | null }) {
-  // Use ref to track the blob URL so we can clean it up properly
-  const blobUrlRef = useRef<string | null>(null);
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
   
-  // Create blob URL when video changes
-  if (video?.videoData && !blobUrlRef.current) {
-    blobUrlRef.current = URL.createObjectURL(video.videoData);
-  }
-  
-  // Cleanup on unmount or when video changes
+  // Create and cleanup blob URL when video changes
   useEffect(() => {
-    const currentBlobUrl = blobUrlRef.current;
+    if (!video?.videoData) {
+      setBlobUrl(null);
+      return;
+    }
     
+    // Create new blob URL
+    const url = URL.createObjectURL(video.videoData);
+    setBlobUrl(url);
+    
+    // Cleanup on unmount or when video changes
     return () => {
-      if (currentBlobUrl) {
-        URL.revokeObjectURL(currentBlobUrl);
-        blobUrlRef.current = null;
-      }
+      URL.revokeObjectURL(url);
     };
   }, [video?.videoData]);
 
-  if (!video || !blobUrlRef.current) return null;
+  if (!video || !blobUrl) return null;
 
   return (
     <div className="rounded-lg overflow-hidden">
       <video
-        src={blobUrlRef.current}
+        src={blobUrl}
         controls
         autoPlay
         loop

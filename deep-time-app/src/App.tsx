@@ -9,7 +9,7 @@
 import { useEffect, useState, useCallback, lazy, Suspense } from 'react';
 import { useAppStore } from './store/appStore';
 import { Home } from './pages';
-import { FullPageSpinner, InstallBanner, hasApiKey, ControlPanel, FloatingControlButton } from './components';
+import { FullPageSpinner, hasApiKey, ControlPanel, FloatingControlButton } from './components';
 import { useWebXRSupport, useCacheInitialization } from './hooks';
 import { arFallbackDetector } from './ar/ARFallbackDetector';
 
@@ -172,7 +172,6 @@ function App() {
       return (
         <>
           <Home onEnterAR={handleEnterAR} />
-          <InstallBanner />
           
           {/* Unified Control Button - combines dashboard + settings */}
           <FloatingControlButton 
