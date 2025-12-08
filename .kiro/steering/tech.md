@@ -61,7 +61,7 @@ npm run test:watch   # Watch mode for tests
 cd deep-time-app
 npm install          # Install app dependencies
 npm run dev          # Start dev server (Vite)
-npm run build        # Production build (tsc -b && vite build)
+npm run build        # Production build (vite build)
 npm run preview      # Preview production build
 npm run lint         # ESLint
 

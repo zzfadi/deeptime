@@ -28,18 +28,25 @@ export const timestampArb: fc.Arbitrary<Date> = fc.date({
 
 /**
  * Generate a valid (non-expired) cache metadata
- * The expiresAt is in the future relative to now
+ * The expiresAt is in the future relative to now, and cachedAt is consistent
  */
-export const validCacheMetadataArb: fc.Arbitrary<CacheMetadata> = fc.record({
-  cacheKey: cacheKeyArb,
-  cachedAt: timestampArb,
-  // expiresAt is in the future (valid)
-  expiresAt: fc.integer({ min: 1, max: 365 * 24 * 60 * 60 * 1000 }).map(
-    (futureMs) => new Date(Date.now() + futureMs)
-  ),
-  lastAccessed: timestampArb,
-  size: fc.integer({ min: 100, max: 10 * 1024 * 1024 }), // 100 bytes to 10MB
-  version: fc.integer({ min: 1, max: 10 }),
+export const validCacheMetadataArb: fc.Arbitrary<CacheMetadata> = fc.integer({ 
+  min: 1, 
+  max: 365 * 24 * 60 * 60 * 1000 // up to 1 year in the future
+}).chain((futureMs) => {
+  const now = Date.now();
+  const expiresAt = new Date(now + futureMs);
+  // cachedAt should be expiresAt - TTL (or now if that would be in the future)
+  const cachedAt = new Date(Math.min(now, expiresAt.getTime() - CACHE_TTL_MS));
+  
+  return fc.record({
+    cacheKey: cacheKeyArb,
+    cachedAt: fc.constant(cachedAt),
+    expiresAt: fc.constant(expiresAt),
+    lastAccessed: fc.constant(new Date(now)), // lastAccessed should be recent
+    size: fc.integer({ min: 100, max: 10 * 1024 * 1024 }), // 100 bytes to 10MB
+    version: fc.integer({ min: 1, max: 10 }),
+  });
 });
 
 /**

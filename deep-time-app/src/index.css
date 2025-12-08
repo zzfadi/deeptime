@@ -151,4 +151,59 @@
       transform: translateY(0);
     }
   }
+
+  /* Responsive layout utilities for orientation changes */
+  /* Requirement 4.3: Adapt layout smoothly for orientation changes */
+  
+  /* Portrait mode - full width layers */
+  .portrait-mode {
+    @apply w-full;
+  }
+
+  /* Landscape mode - constrained width with centered content */
+  .landscape-mode {
+    @apply w-full;
+  }
+
+  /* Smooth orientation transition */
+  .orientation-transition {
+    transition: all 0.3s ease-out;
+  }
+
+  /* Touch manipulation for better mobile interaction */
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+}
+
+/* Responsive breakpoints for orientation handling */
+/* Requirement 4.3: Handle portrait/landscape orientation */
+@media (orientation: landscape) {
+  .layer-explorer-container {
+    max-height: calc(100vh - 60px);
+  }
+  
+  /* In landscape, give more horizontal space to content */
+  .layer-card-expanded {
+    max-height: calc(100vh - 150px);
+  }
+}
+
+@media (orientation: portrait) {
+  .layer-explorer-container {
+    max-height: calc(100vh - 80px);
+  }
+  
+  /* In portrait, allow more vertical space for expanded content */
+  .layer-card-expanded {
+    max-height: calc(100vh - 200px);
+  }
+}
+
+/* Ensure proper scrolling behavior on iOS */
+/* Requirement 4.4: Enable vertical scrolling within expanded layer section */
+@supports (-webkit-touch-callout: none) {
+  .overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+  }
 }

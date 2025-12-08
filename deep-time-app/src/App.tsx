@@ -13,10 +13,6 @@ import { FullPageSpinner, InstallBanner, hasApiKey, ControlPanel, FloatingContro
 import { useWebXRSupport, useCacheInitialization } from './hooks';
 import { arFallbackDetector } from './ar/ARFallbackDetector';
 
-// Lazy load EraDetail page for code splitting
-// This reduces initial bundle size by loading EraDetail only when needed
-const EraDetail = lazy(() => import('./pages/EraDetail'));
-
 // Lazy load ARView for code splitting - Three.js is a large dependency
 const ARView = lazy(() => import('./components/ARView'));
 const IOSARView = lazy(() => import('./components/IOSARView'));
@@ -26,13 +22,14 @@ const IOSARView = lazy(() => import('./components/IOSARView'));
 // Import iOS detection
 import { isIOS } from './utils/iosARDetection';
 
-type Page = 'home' | 'era-detail' | 'ar';
+// Requirement 6.1: No separate EraDetail page - all content inline in LayerExplorer
+type Page = 'home' | 'ar';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [arChecked, setArChecked] = useState(false);
   const [showControlPanel, setShowControlPanel] = useState(false);
-  const { setOfflineStatus, setViewMode, currentEra, narrative, isNarrativeLoading, location } = useAppStore();
+  const { setOfflineStatus, setViewMode, currentEra, narrative } = useAppStore();
   const webXRSupport = useWebXRSupport();
   
   // Initialize cache on app startup
@@ -115,31 +112,22 @@ function App() {
     }
   }, [webXRSupport.isChecking, arChecked, setViewMode]);
 
-  // Navigation handlers
-  const handleViewEraDetail = useCallback(() => {
-    // Only navigate if we have an era and narrative is not loading
-    if (currentEra && !isNarrativeLoading) {
-      setCurrentPage('era-detail');
-    }
-  }, [currentEra, isNarrativeLoading]);
-
-  const handleBackToHome = useCallback(() => {
-    setCurrentPage('home');
-    setViewMode('card');
-  }, [setViewMode]);
-
-  // Handle entering AR mode from card view
-  // Requirements: 1.1 - AR as primary mode when supported
-  const handleARClick = useCallback(() => {
-    if (currentEra && webXRSupport.isARSupported) {
+  // Handle entering AR mode from LayerExplorer
+  // Requirement 5.3: Transition to AR view for selected era
+  // Requirement 6.1: Navigate directly to AR from LayerExplorer (no EraDetail page)
+  const handleEnterAR = useCallback((layer: import('deep-time-core/types').GeologicalLayer) => {
+    if (layer && webXRSupport.isARSupported) {
+      // Store the selected era in app state
+      useAppStore.getState().selectEra(layer);
       setCurrentPage('ar');
       setViewMode('ar');
     }
-  }, [currentEra, webXRSupport.isARSupported, setViewMode]);
+  }, [webXRSupport.isARSupported, setViewMode]);
 
   // Handle exiting AR mode
+  // Requirement 5.4: Return to layer view with same layer expanded
   const handleARExit = useCallback(() => {
-    setCurrentPage('era-detail');
+    setCurrentPage('home');
     setViewMode('card');
     arFallbackDetector.setCardViewFallback();
   }, [setViewMode]);
@@ -177,34 +165,13 @@ function App() {
         </Suspense>
       );
 
-    case 'era-detail':
-      // If no era is selected, go back to home
-      if (!currentEra) {
-        setCurrentPage('home');
-        return <FullPageSpinner />;
-      }
-      return (
-        <Suspense fallback={
-          <div className="min-h-screen bg-deep-900 flex items-center justify-center">
-            <FullPageSpinner label="Loading era details..." />
-          </div>
-        }>
-          <EraDetail
-            era={currentEra}
-            narrative={narrative}
-            isLoading={isNarrativeLoading}
-            location={location}
-            onBack={handleBackToHome}
-            onARClick={handleARClick}
-          />
-        </Suspense>
-      );
-    
     case 'home':
     default:
+      // Requirement 6.1: All layer content displayed inline in LayerExplorer
+      // No separate EraDetail page navigation
       return (
         <>
-          <Home onViewEraDetail={handleViewEraDetail} />
+          <Home onEnterAR={handleEnterAR} />
           <InstallBanner />
           
           {/* Unified Control Button - combines dashboard + settings */}

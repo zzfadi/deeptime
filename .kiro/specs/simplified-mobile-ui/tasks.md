@@ -1,0 +1,129 @@
+# Implementation Plan
+
+- [x] 1. Create LayerCard component with collapsed/expanded states
+  - [x] 1.1 Create LayerCard component with collapsed state showing era name, time period, and color indicator
+    - Create `deep-time-app/src/components/LayerCard.tsx`
+    - Implement collapsed state with 72px height, era color bar, Playfair Display typography
+    - Add chevron indicator and subtle rock texture overlay
+    - _Requirements: 1.2, 4.1_
+  - [ ]* 1.2 Write property test for layer content completeness
+    - **Property 2: Layer content completeness**
+    - **Validates: Requirements 1.2, 2.3, 2.4**
+  - [x] 1.3 Implement expanded state with narrative, tags, and action buttons
+    - Add smooth height animation (300ms ease-out)
+    - Display era name, time period, short description, climate/flora/fauna tags
+    - Add "Generate Image" and "Enter AR" buttons
+    - _Requirements: 2.3, 2.4_
+  - [ ]* 1.4 Write property test for toggle behavior
+    - **Property 4: Toggle behavior**
+    - **Validates: Requirements 2.1, 2.5**
+
+- [x] 2. Create LayerExplorer container component
+  - [x] 2.1 Create LayerExplorer component that renders LayerCard list
+    - Create `deep-time-app/src/components/LayerExplorer.tsx`
+    - Implement vertical scrollable list with momentum scrolling
+    - Manage expanded layer state (single expansion)
+    - _Requirements: 1.1, 1.3_
+  - [ ]* 2.2 Write property test for all layers rendered
+    - **Property 1: All layers rendered**
+    - **Validates: Requirements 1.1**
+  - [ ]* 2.3 Write property test for single expansion invariant
+    - **Property 3: Single expansion invariant**
+    - **Validates: Requirements 1.3, 2.2**
+
+- [x] 3. Implement progressive AI content loading in LayerCard
+  - [x] 3.1 Add narrative loading with cache-first behavior
+    - Load cached narrative immediately on expand
+    - Show loading indicator only on cache miss
+    - Display narrative text and environment tags when loaded
+    - _Requirements: 3.1, 3.2_
+  - [ ]* 3.2 Write property test for cache-first narrative loading
+    - **Property 5: Cache-first narrative loading**
+    - **Validates: Requirements 3.1, 3.2**
+  - [x] 3.3 Implement image generation button and display
+    - Add "Generate Image" button that triggers AI image generation
+    - Display generated image inline below description
+    - Show loading state during generation
+    - _Requirements: 3.3_
+  - [x] 3.4 Implement video generation button (appears after image)
+    - Show "Generate Video" button only after image is generated
+    - Display generated video inline below image
+    - Show loading state during generation
+    - _Requirements: 3.4, 3.5_
+  - [ ]* 3.5 Write property test for progressive media generation
+    - **Property 6: Progressive media generation**
+    - **Validates: Requirements 3.4**
+  - [x] 3.6 Implement error handling with retry
+    - Display user-friendly error message on generation failure
+    - Add retry button that re-triggers failed operation
+    - _Requirements: 3.6_
+  - [ ]* 3.7 Write property test for error recovery
+    - **Property 7: Error recovery**
+    - **Validates: Requirements 3.6**
+
+- [x] 4. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 5. Implement AR button state and navigation
+  - [x] 5.1 Add AR support detection and button state
+    - Disable AR button when WebXR not supported
+    - Add tooltip explaining why AR is unavailable
+    - Enable button when AR is supported
+    - _Requirements: 5.2_
+  - [ ]* 5.2 Write property test for AR button state
+    - **Property 9: AR button state**
+    - **Validates: Requirements 5.2**
+  - [x] 5.3 Implement AR navigation with state preservation
+    - Navigate to AR view when AR button tapped
+    - Preserve expanded layer state when returning from AR
+    - _Requirements: 5.3, 5.4_
+
+- [x] 6. Update App.tsx to use new components
+  - [x] 6.1 Replace CrossSectionView with LayerExplorer in Home page
+    - Update Home.tsx to use LayerExplorer instead of CrossSectionView
+    - Remove onViewEraDetail callback (no longer needed)
+    - Pass onEnterAR callback for AR navigation
+    - _Requirements: 6.1, 6.2_
+  - [x] 6.2 Remove EraDetail page navigation from App.tsx
+    - Remove 'era-detail' page case from App.tsx
+    - Remove EraDetail lazy import
+    - Update navigation to go directly to AR from LayerExplorer
+    - _Requirements: 6.1_
+  - [ ]* 6.3 Write property test for no separate detail page
+    - **Property 10: No separate detail page**
+    - **Validates: Requirements 6.1, 6.4**
+
+- [x] 7. Add touch target and responsive styling
+  - [x] 7.1 Ensure minimum touch target heights
+    - Set minimum height of 44px for collapsed LayerCard
+    - Ensure buttons have adequate touch targets
+    - _Requirements: 4.1_
+  - [ ]* 7.2 Write property test for touch target minimum
+    - **Property 8: Touch target minimum**
+    - **Validates: Requirements 4.1**
+  - [x] 7.3 Add responsive layout for orientation changes
+    - Handle portrait/landscape orientation
+    - Ensure content scrolls properly when expanded
+    - _Requirements: 4.3, 4.4_
+
+- [x] 8. Simplify LocationHeader
+  - [x] 8.1 Reduce LocationHeader to minimal design
+    - Show only location name and search icon
+    - Reduce header height for more content space
+    - _Requirements: 4.2_
+
+- [x] 9. Clean up removed components
+  - [x] 9.1 Remove deprecated components and update exports
+    - Remove CrossSectionView.tsx
+    - Remove LayerInfoPanel.tsx
+    - Remove LayerStack.tsx
+    - Remove LayerStratum.tsx
+    - Update components/index.ts barrel exports
+    - _Requirements: 6.3_
+  - [x] 9.2 Remove EraDetail page
+    - Remove EraDetail.tsx from pages
+    - Update pages/index.ts barrel exports
+    - _Requirements: 6.1_
+
+- [x] 10. Final Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.

@@ -36,5 +36,4 @@ coverage/
 .firebase/
 firebase-debug.log
 
-# IMPORTANT: Do NOT ignore .kiro directory (required for Kiroween hackathon)
-# The .kiro directory contains specs, hooks, and steering files that demonstrate Kiro usage
+docs/*

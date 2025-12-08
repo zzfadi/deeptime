@@ -30,7 +30,6 @@ deep-time-app/
 │   │
 │   ├── components/          # React UI components
 │   │   ├── index.ts         # Barrel exports (ARView excluded for code splitting)
-│   │   ├── ARView.tsx       # WebXR AR experience (lazy loaded)
 │   │   └── ...
 │   │
 │   ├── pages/               # Page components
@@ -41,16 +40,13 @@ deep-time-app/
 │   ├── ar/                  # AR module (Three.js, WebXR)
 │   │   ├── index.ts         # Barrel exports
 │   │   ├── ARSessionManager.ts
-│   │   ├── CreatureManager.ts
-│   │   └── ...
+│   │   └── CreatureManager.ts
 │   │
 │   ├── services/            # External API integrations
 │   │   ├── index.ts         # Barrel exports
 │   │   ├── location.ts      # Geolocation + Nominatim geocoding
 │   │   ├── geological.ts    # USGS API + IndexedDB cache
-│   │   ├── narrative.ts     # Legacy narrative service
 │   │   ├── firebase.ts      # Firestore integration
-│   │   ├── cache.ts         # IndexedDB local cache
 │   │   └── ai/              # AI content generation module
 │   │       ├── index.ts         # Barrel exports for all AI services
 │   │       ├── types.ts         # AI-specific type definitions
@@ -58,9 +54,7 @@ deep-time-app/
 │   │       ├── textGenerator.ts        # Gemini text generation
 │   │       ├── imageGenerator.ts       # Gemini image generation
 │   │       ├── videoGenerator.ts       # Veo video generation
-│   │       ├── cacheManager.ts         # IndexedDB cache management
-│   │       ├── costTrackingService.ts  # API cost tracking
-│   │       └── ...
+│   │       └── cacheManager.ts         # IndexedDB cache management
 │   │
 │   ├── store/               # Zustand state management
 │   │   └── appStore.ts      # Central app state
@@ -101,5 +95,5 @@ import { contentOrchestrator, type EraContent } from './services/ai';
 - **Barrel exports**: Each module has an `index.ts` that exports public API
 - **Type exports**: Export types separately with `export type { ... }`
 - **Error classes**: Custom error classes per service (e.g., `LocationError`, `AIError`)
-- **Service singletons**: Services exported as singleton instances (e.g., `export const locationService = ...`)
-- **JSDoc comments**: Document requirements with `@requirement` or inline comments like `// Requirement 1.1: ...`
+- **Service singletons**: Services exported as singleton instances
+- **JSDoc comments**: Document requirements with `@requirement` or `// Requirement X.X: ...`

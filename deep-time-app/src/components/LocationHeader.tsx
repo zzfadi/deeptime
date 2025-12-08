@@ -1,7 +1,7 @@
 /**
  * LocationHeader Component
- * Displays current location name, search button, and offline indicator
- * Requirements: 1.1, 1.4, 5.3
+ * Simplified minimal header showing only location name and search icon
+ * Requirements: 4.2 - Position header at top with minimal height
  */
 
 import { useState, useCallback, useEffect } from 'react';
@@ -11,7 +11,7 @@ import { locationService, type GeoCoordinateWithName } from '../services/locatio
 export interface LocationHeaderProps {
   location: GeoCoordinate | null;
   isLoading: boolean;
-  isOffline: boolean;
+  isOffline?: boolean; // Optional - not displayed in minimal design
   onSearch: (query: string) => Promise<GeoCoordinate[]>;
   onLocationSelect: (location: GeoCoordinate) => void;
   onRequestLocation?: () => void;
@@ -79,30 +79,7 @@ function LocationIcon({ className }: { className?: string }) {
   );
 }
 
-/**
- * Offline indicator badge
- * Requirement 5.3: Display cached locations with offline indicator
- */
-function OfflineBadge() {
-  return (
-    <span className="offline-badge">
-      <svg
-        className="w-3 h-3"
-        fill="currentColor"
-        viewBox="0 0 20 20"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          fillRule="evenodd"
-          d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z"
-          clipRule="evenodd"
-        />
-        <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
-      </svg>
-      Offline
-    </span>
-  );
-}
+
 
 /**
  * Search modal for manual location entry
@@ -272,18 +249,15 @@ function SearchModal({ isOpen, onClose, onLocationSelect, onRequestLocation }: S
 
 
 /**
- * LocationHeader Component
- * Displays current location name with search and offline indicators
+ * LocationHeader Component - Simplified Minimal Design
+ * Shows only location name and search icon with reduced height
  * 
  * Requirements:
- * - 1.1: Request GPS location permission (displays location status)
- * - 1.4: Allow manual location entry via search
- * - 5.3: Display cached locations with offline indicator
+ * - 4.2: Position header at top with minimal height
  */
 export function LocationHeader({
   location,
   isLoading,
-  isOffline,
   onSearch,
   onLocationSelect,
   onRequestLocation,
@@ -320,56 +294,37 @@ export function LocationHeader({
       });
   }, [location]);
 
+  // Get display text for location
+  const getLocationDisplay = () => {
+    if (isLoading) return 'Locating...';
+    if (!location) return 'Select Location';
+    if (isReverseGeocoding) return formatCoordinates(location);
+    return locationName || formatCoordinates(location);
+  };
+
   return (
     <>
-      <header className="flex items-center justify-between px-4 py-3 bg-deep-800/80 backdrop-blur-sm safe-top">
-        {/* Location display */}
-        <div className="flex items-center gap-2 min-w-0">
-          <LocationIcon className="w-5 h-5 text-blue-400 flex-shrink-0" />
-          
-          {isLoading ? (
-            <span className="text-gray-400 animate-pulse">Locating...</span>
-          ) : location ? (
-            <span className="text-white truncate">
-              {isReverseGeocoding ? formatCoordinates(location) : (locationName || formatCoordinates(location))}
-            </span>
-          ) : (
-            <div className="flex items-center gap-3">
-              {onRequestLocation && (
-                <button 
-                  onClick={onRequestLocation}
-                  className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2v2m0 16v2m10-10h-2M4 12H2m15.364-6.364l-1.414 1.414M6.05 17.95l-1.414 1.414m12.728 0l-1.414-1.414M6.05 6.05L4.636 4.636" />
-                  </svg>
-                  Use My Location
-                </button>
-              )}
-              <span className="text-gray-500 text-sm">or</span>
-              <button 
-                onClick={() => setIsSearchOpen(true)}
-                className="text-blue-400 hover:text-blue-300 transition-colors text-sm underline"
-              >
-                Search
-              </button>
-            </div>
-          )}
-        </div>
+      {/* Minimal header - reduced height (py-2 instead of py-3) */}
+      <header className="flex items-center justify-between px-3 py-2 bg-deep-900/90 backdrop-blur-sm safe-top border-b border-stone-800/50">
+        {/* Location name - tappable to open search */}
+        <button
+          onClick={() => setIsSearchOpen(true)}
+          className="flex items-center gap-2 min-w-0 flex-1 text-left"
+        >
+          <LocationIcon className="w-4 h-4 text-amber-500 flex-shrink-0" />
+          <span className={`text-sm font-medium truncate ${isLoading ? 'text-gray-400 animate-pulse' : 'text-stone-200'}`}>
+            {getLocationDisplay()}
+          </span>
+        </button>
 
-        {/* Right side: offline badge and search button */}
-        <div className="flex items-center gap-2 flex-shrink-0">
-          {isOffline && <OfflineBadge />}
-          
-          <button
-            onClick={() => setIsSearchOpen(true)}
-            className="p-2 text-gray-400 hover:text-white transition-colors touch-target"
-            aria-label="Search location"
-          >
-            <SearchIcon className="w-5 h-5" />
-          </button>
-        </div>
+        {/* Search icon button */}
+        <button
+          onClick={() => setIsSearchOpen(true)}
+          className="p-2 text-stone-400 hover:text-stone-200 transition-colors"
+          aria-label="Search location"
+        >
+          <SearchIcon className="w-4 h-4" />
+        </button>
       </header>
 
       {/* Search modal */}
